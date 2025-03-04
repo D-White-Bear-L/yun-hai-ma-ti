@@ -9,10 +9,10 @@ import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import { getServerSideConfig } from "./config/server";
 
 export const metadata: Metadata = {
-  title: "NextChat",
-  description: "Your personal ChatGPT Chat Bot.",
+  title: "云海马体 - 记忆增强助理",
+  description: "您的记忆增强助理",
   appleWebApp: {
-    title: "NextChat",
+    title: "云海马体 - 记忆增强助理",
     statusBarStyle: "default",
   },
 };
@@ -37,6 +37,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* favicon */}
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/N-favicon-32x32.png" type="image/png" />
+
         <meta name="config" content={JSON.stringify(getClientConfig())} />
         <meta
           name="viewport"

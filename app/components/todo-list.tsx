@@ -29,7 +29,6 @@ export function TodoList() {
   // 1. 首先从localStorage加载数据，只在组件挂载时执行一次
   useEffect(() => {
     const savedTodos = localStorage.getItem("todos");
-    console.log("从localStorage读取:", savedTodos);
     if (savedTodos && savedTodos !== "[]") {
       try {
         const parsedTodos = JSON.parse(savedTodos);
@@ -44,12 +43,12 @@ export function TodoList() {
   useEffect(() => {
     // 跳过组件初始挂载时的保存操作
     if (todos.length > 0 || localStorage.getItem("todos") === "[]") {
-      console.log("保存到localStorage:", todos);
+      // console.log("保存到localStorage:", todos);
       localStorage.setItem("todos", JSON.stringify(todos));
     }
   }, [todos]);
 
-  // 3. 检查过期待办事项的定时器逻辑移到单独的useEffect
+  // 3. 检查过期待办
   useEffect(() => {
     const checkExpiredTodos = () => {
       const currentTime = new Date().getTime();
@@ -75,11 +74,14 @@ export function TodoList() {
       });
     };
 
-    // 设置每小时检查一次
-    const intervalId = setInterval(checkExpiredTodos, 60 * 60 * 1000);
+    // 一旦页面加载就检查一次
+    checkExpiredTodos();
 
-    // 组件卸载时清除定时器
-    return () => clearInterval(intervalId);
+    // // 设置分钟检查一次（这里是组件启动后开始计时轮巡）
+    // const intervalId = setInterval(checkExpiredTodos, 60 * 1000);
+
+    // // 组件卸载时清除定时器
+    // return () => clearInterval(intervalId);
   }, []); // 只在组件挂载时设置一次定时器
 
   // 添加新待办事项
@@ -188,7 +190,7 @@ export function TodoList() {
                     type="text"
                     value={newTodo}
                     onChange={(e) => setNewTodo(e.target.value)}
-                    placeholder="输入新的待办事项..."
+                    placeholder="输入添加新的待办"
                     className={styles["todo-input"]}
                     onKeyDown={(e) =>
                       e.key === "Enter" && newTodo.trim() !== "" && addTodo()
@@ -272,7 +274,16 @@ export function TodoList() {
                         </span>
                       </div>
 
-                      <div className={styles["todo-date"]}>
+                      <div
+                        className={styles["todo-date"]}
+                        style={{
+                          color:
+                            new Date(todo.dueDate).getTime() - Date.now() <=
+                            5 * 60 * 1000
+                              ? "red"
+                              : "inherit",
+                        }}
+                      >
                         {todo.dueDate ? formatDueDate(todo.dueDate) : ""}
                       </div>
 

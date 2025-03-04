@@ -25,7 +25,7 @@
 .todo-input-wrapper {
   background-color: var(--second);
   border-radius: 0.75rem;
-  padding: 4%;
+  padding: 1%;
   box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
@@ -83,6 +83,11 @@
   
   &::placeholder {
     color: #718096;
+  }
+
+
+  @media (min-width: 992px) {
+      width: 90%;
   }
 }
 
@@ -173,6 +178,7 @@
 
 // 列表容器样式
 .todo-list-section {
+  margin-top: 8px;
   background-color: white;
   border-radius: 0.75rem;
   box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05);
@@ -181,7 +187,7 @@
 
 .todo-list-header {
   display: flex;
-  padding: 3% 4%;
+  padding: 1% 2%;
   background-color: var(--second);
   border-bottom: 1px solid var(--border-in-light);
   font-weight: 600;
