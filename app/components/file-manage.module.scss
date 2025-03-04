@@ -1,0 +1,92 @@
+// but Edge
+.ImageGallery {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 16px;
+
+  @supports not (display: grid) {
+    display: -webkit-box; // 兼容IE10
+    display: -ms-flexbox; // 兼容IE10
+    display: flex; // 兼容现代浏览器
+    -ms-flex-wrap: wrap; // 兼容IE10
+    flex-wrap: wrap; // 兼容现代浏览器
+    margin: -8px; // 兼容现代浏览器
+  }
+}
+
+.ImageWrapper {
+  background-color: #e7f8ff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+  padding: 8px;
+  -o-object-fit: cover;
+     object-fit: cover; // 图片覆盖整个容器
+  -webkit-transition-property: -webkit-transform, -webkit-box-shadow; // 兼容现代浏览器
+  transition-property: -webkit-transform, -webkit-box-shadow; // 兼容现代浏览器
+  -o-transition-property: transform, box-shadow; // 兼容IE10
+  transition-property: transform, box-shadow; // 兼容现代浏览器
+  transition-property: transform, box-shadow, -webkit-transform, -webkit-box-shadow;
+  -webkit-transition-duration: 0.3s;
+       -o-transition-duration: 0.3s;
+          transition-duration: 0.3s;
+  -webkit-transition-timing-function: ease;
+       -o-transition-timing-function: ease;
+          transition-timing-function: ease;
+
+  @supports not (display: grid) {
+    width: calc(50% - 16px);
+    margin: 8px;
+  }
+
+  &:hover {
+    -webkit-transform: scale(1.05);
+        -ms-transform: scale(1.05);
+            transform: scale(1.05);
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.Image {
+  width: 100%;
+  height: 100%; 
+  -o-object-fit: cover;
+     object-fit: cover; // 图片覆盖整个容器
+  border-radius: 4px;
+
+  @supports not (object-fit: cover) {
+    background-size: cover;
+    background-position: center center;
+  }
+
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    /* IE10+ specific styles go here */
+    width: auto;
+    height: auto;  
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.PreviewMask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.ImagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}

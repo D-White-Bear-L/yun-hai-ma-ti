@@ -1,0 +1,389 @@
+// 页面容器
+.mask-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f7fa;
+}
+
+.mask-page-body {
+  flex: 1;
+  overflow: auto;
+  padding: 2%;
+}
+
+// 待办事项容器
+.todo-container {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2%;
+}
+
+// 输入区域样式
+.todo-input-wrapper {
+  background-color: var(--second);
+  border-radius: 0.75rem;
+  padding: 4%;
+  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.todo-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3%;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+.input-row {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  
+  // 确保输入行不会溢出父容器
+  box-sizing: border-box;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  @media (min-width: 992px) {
+    &:first-child {
+      flex: 1;
+    }
+    
+    &:not(:first-child) {
+      width: auto;
+    }
+    
+    margin-bottom: 0;
+  }
+}
+
+.todo-input {
+  width: 100%;
+  padding: 3%;
+  border: 1px solid var(--border-in-light);
+  border-radius: 0.5rem;
+  transition: all 0.25s ease;
+  font-size: 1rem;
+  background: white;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.125rem rgba(var(--primary-rgb), 0.1);
+  }
+  
+  &::placeholder {
+    color: #718096;
+  }
+}
+
+.todo-date-input {
+  width: 100%;
+  padding: 0.75rem 0.75rem;  // 减少左右内边距
+  border: 1px solid var(--border-in-light);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: white;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  
+  // 确保日期输入框的宽度适应内容
+  &::-webkit-datetime-edit {
+    width: calc(100% - 20px);
+    overflow: hidden;
+  }
+  
+  // 调整日历图标位置和大小
+  &::-webkit-calendar-picker-indicator {
+    opacity: 0.7;
+    cursor: pointer;
+    position: absolute;
+    right: 0.5rem;  // 更靠近右边缘
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.125rem rgba(var(--primary-rgb), 0.1);
+  }
+  
+  @media (min-width: 992px) {
+    width: 14rem;
+    padding: 0.75rem 1rem;  // 桌面版可以有更多内边距
+    
+    &::-webkit-calendar-picker-indicator {
+      right: 0.75rem;
+    }
+  }
+}
+
+.todo-add-button {
+  width: 100%;
+  padding: 3%;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  
+  @media (min-width: 768px) {
+    width: auto;
+    min-width: 5rem;
+    padding: 0.75rem 1.5rem;
+    white-space: nowrap;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: var(--primary);
+    opacity: 0.9;
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0.0625rem);
+  }
+  
+  &:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+  }
+}
+
+.button-disabled {
+  opacity: 0.7;
+  background-color: #a0aec0 !important;
+}
+
+// 列表容器样式
+.todo-list-section {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.todo-list-header {
+  display: flex;
+  padding: 3% 4%;
+  background-color: var(--second);
+  border-bottom: 1px solid var(--border-in-light);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--black-80);
+}
+
+.task-column {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding-left: 3.5rem; /* 增加左内边距以匹配内容 */
+}
+
+.time-column {
+  width: 30%;
+  text-align: center;
+  padding-right: 0;
+  
+  @media (min-width: 768px) {
+    width: 25%;
+  }
+}
+
+.action-column {
+  width: 10%;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+}
+
+// 空状态样式
+.todo-empty {
+  padding: 10% 4%;
+  text-align: center;
+  color: var(--black-50);
+}
+
+.todo-empty-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4%;
+  
+  svg {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.todo-empty-text {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 2%;
+  color: var(--black);
+}
+
+.todo-empty-hint {
+  font-size: 0.875rem;
+  color: var(--black-50);
+}
+
+// 列表样式
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todo-item {
+  display: flex;
+  padding: 3% 4%;
+  border-bottom: 1px solid var(--border-in-light);
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: var(--hover-color);
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.todo-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* 更精确的间距控制 */
+  flex: 1;
+  min-width: 0;
+  padding-left: 0.5rem; /* 添加左侧内边距 */
+}
+
+// 复选框样式
+.todo-checkbox-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.todo-checkbox {
+  position: absolute;
+  opacity: 0;
+  
+  & + label {
+    display: inline-block;
+    width: 1.375rem;
+    height: 1.375rem;
+    border: 2px solid var(--primary);
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white;
+  }
+  
+  &:checked + label {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    
+    &:after {
+      content: '';
+      position: absolute;
+      left: 0.5rem;
+      top: 0.3125rem;
+      width: 0.375rem;
+      height: 0.6875rem;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+// 内容样式
+.todo-text {
+  font-size: 1rem;
+  color: var(--black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  padding-left: 0.25rem; /* 微调左内边距 */
+}
+
+.completed {
+  text-decoration: line-through;
+  color: var(--black-50);
+}
+
+.todo-date {
+  width: 30%;
+  color: var(--black-50);
+  font-size: 0.875rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-right: 0;
+  
+  @media (min-width: 768px) {
+    width: 25%;
+  }
+  
+  span {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+// 删除按钮列包装器
+.todo-action-wrapper {
+  width: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// 删除按钮样式
+.todo-delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--black-30);
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0;
+  
+  &:hover {
+    background-color: #fee2e2;
+    color: #e53e3e;
+  }
+}

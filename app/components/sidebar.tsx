@@ -34,9 +34,11 @@ import clsx from "clsx";
 import { isMcpEnabled } from "../mcp/actions";
 
 const DISCOVERY = [
+  { name: Locale.FileManage.Page.Title, path: Path.FileManage },
+  { name: Locale.TodoList.Page.Title, path: Path.TodoList },
+  { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
   { name: Locale.Plugin.Name, path: Path.Plugins },
   { name: "Stable Diffusion", path: Path.Sd },
-  { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
 ];
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
@@ -250,8 +252,8 @@ export function SideBar(props: { className?: string }) {
       {...props}
     >
       <SideBarHeader
-        title="NextChat"
-        subTitle="Build your own AI assistant."
+        title="云海马体"
+        subTitle="您的记忆增强助理"
         logo={<ChatGptIcon />}
         shouldNarrow={shouldNarrow}
       >

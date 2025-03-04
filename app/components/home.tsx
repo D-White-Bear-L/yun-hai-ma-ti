@@ -82,6 +82,19 @@ const McpMarketPage = dynamic(
   },
 );
 
+// 文件管理
+const FileManage = dynamic(
+  async () => (await import("./file-manage")).FileManage,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
+
+// 待办
+const TodoList = dynamic(async () => (await import("./todo-list")).TodoList, {
+  loading: () => <Loading noLogo />,
+});
+
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -202,6 +215,8 @@ function Screen() {
             <Route path={Path.Chat} element={<Chat />} />
             <Route path={Path.Settings} element={<Settings />} />
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
+            <Route path={Path.FileManage} element={<FileManage />} />
+            <Route path={Path.TodoList} element={<TodoList />} />
           </Routes>
         </WindowContent>
       </>

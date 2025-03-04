@@ -655,6 +655,23 @@ const cn = {
   FineTuned: {
     Sysmessage: "你是一个助手",
   },
+  // Add
+  FileManage: {
+    Name: "文件管理",
+    Page: {
+      Title: "文件管理",
+      Search: "输入搜索关键词",
+      SubTitle: (count: number) => `共 ${count} 张图片`,
+    },
+  },
+  TodoList: {
+    Name: "待办",
+    Page: {
+      Title: "待办",
+      Search: "输入搜索关键词",
+      SubTitle: (count: number) => `共 ${count} 条待办`,
+    },
+  },
   SearchChat: {
     Name: "搜索聊天记录",
     Page: {

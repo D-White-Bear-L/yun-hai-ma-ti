@@ -24,6 +24,7 @@ import { IconButton } from "./button";
 
 import { useAppConfig } from "../store/config";
 import clsx from "clsx";
+import styles from "./chat.module.scss";
 
 export function Mermaid(props: { code: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -267,11 +268,517 @@ function tryWrapHtmlCode(text: string) {
     );
 }
 
+// 自定义组件，用于处理特殊标签
+function CustomMarkdownContent({ content }: { content: string }) {
+  // 状态用于跟踪每个函数参数标签和思考标签的展开/折叠状态
+  const [expandedFunctions, setExpandedFunctions] = useState<
+    Record<string, boolean>
+  >({});
+  const [expandedThinks, setExpandedThinks] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  // 检查内容中是否包含特殊标签
+  const hasThinkTag = content.includes("<think>");
+  const hasFunctionArgumentsTag = content.includes("<function_arguments>");
+  const hasSelfAnswerTag = content.includes("<self_answer>");
+
+  // 如果包含特殊标签，使用自定义渲染
+  if (hasThinkTag || hasFunctionArgumentsTag || hasSelfAnswerTag) {
+    // 创建一个包含所有处理后内容的数组
+    const contentParts: JSX.Element[] = [];
+
+    // 将内容按照特殊标签分割
+    const segments = splitContentByTags(content);
+
+    // 处理每个分段
+    segments.forEach((segment, index) => {
+      if (segment.type === "text") {
+        // 普通文本，使用 ReactMarkdown 渲染
+        contentParts.push(
+          <ReactMarkdown
+            key={`text-${index}`}
+            remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
+            rehypePlugins={[
+              RehypeKatex,
+              [
+                RehypeHighlight,
+                {
+                  detect: false,
+                  ignoreMissing: true,
+                },
+              ],
+            ]}
+            components={{
+              pre: PreCode,
+              code: CustomCode,
+              p: (pProps) => <p {...pProps} dir="auto" />,
+              a: (aProps) => {
+                const href = aProps.href || "";
+                if (/\.(aac|mp3|opus|wav)$/.test(href)) {
+                  return (
+                    <figure>
+                      <audio controls src={href}></audio>
+                    </figure>
+                  );
+                }
+                if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
+                  return (
+                    <video controls width="99.9%">
+                      <source src={href} />
+                    </video>
+                  );
+                }
+                const isInternal = /^\/#/i.test(href);
+                const target = isInternal ? "_self" : aProps.target ?? "_blank";
+                return <a {...aProps} target={target} />;
+              },
+            }}
+          >
+            {segment.content}
+          </ReactMarkdown>,
+        );
+      } else if (segment.type === "think") {
+        // 思考标签，添加折叠功能
+        contentParts.push(
+          <div
+            key={`think-${index}`}
+            className={`special-tag ${styles["think-tag"]}`}
+          >
+            <div
+              className={styles["function-header"]}
+              onClick={() => {
+                setExpandedThinks((prev) => ({
+                  ...prev,
+                  [index]: !prev[index],
+                }));
+              }}
+            >
+              <span className={styles["function-name"]}>思考过程</span>
+              <span className={styles["function-status"]}>
+                {expandedThinks[index] ? "折叠" : "展开"}
+              </span>
+            </div>
+
+            {!expandedThinks[index] ? (
+              <div className={styles["function-collapsed"]}>AI 的思考过程</div>
+            ) : (
+              <div className={styles["function-content"]}>
+                <ReactMarkdown
+                  remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
+                  rehypePlugins={[
+                    RehypeKatex,
+                    [
+                      RehypeHighlight,
+                      {
+                        detect: false,
+                        ignoreMissing: true,
+                      },
+                    ],
+                  ]}
+                  components={{
+                    pre: PreCode,
+                    code: CustomCode,
+                    p: (pProps) => <p {...pProps} dir="auto" />,
+                    a: (aProps) => {
+                      const href = aProps.href || "";
+                      if (/\.(aac|mp3|opus|wav)$/.test(href)) {
+                        return (
+                          <figure>
+                            <audio controls src={href}></audio>
+                          </figure>
+                        );
+                      }
+                      if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
+                        return (
+                          <video controls width="99.9%">
+                            <source src={href} />
+                          </video>
+                        );
+                      }
+                      const isInternal = /^\/#/i.test(href);
+                      const target = isInternal
+                        ? "_self"
+                        : aProps.target ?? "_blank";
+                      return <a {...aProps} target={target} />;
+                    },
+                  }}
+                >
+                  {segment.content}
+                </ReactMarkdown>
+              </div>
+            )}
+          </div>,
+        );
+      } else if (segment.type === "function_arguments") {
+        // 函数参数标签
+        let functionName = "函数调用";
+        let functionContent = segment.content;
+        try {
+          const functionData = JSON.parse(segment.content);
+          if (functionData.name) {
+            functionName = functionData.name;
+          }
+          // 将 JSON 格式化为更易读的形式
+          functionContent = JSON.stringify(functionData, null, 2);
+        } catch (e) {
+          // 解析失败时使用原始内容
+        }
+
+        contentParts.push(
+          <div
+            key={`function-${index}`}
+            className={`special-tag ${styles["function-arguments-tag"]}`}
+          >
+            <div
+              className={styles["function-header"]}
+              onClick={() => {
+                setExpandedFunctions((prev) => ({
+                  ...prev,
+                  [index]: !prev[index],
+                }));
+              }}
+            >
+              <span className={styles["function-name"]}>{functionName}</span>
+              <span className={styles["function-status"]}>
+                {expandedFunctions[index] ? "折叠" : "展开"}
+              </span>
+            </div>
+
+            {!expandedFunctions[index] ? (
+              <div className={styles["function-collapsed"]}>函数调用完成</div>
+            ) : (
+              <div className={styles["function-content"]}>
+                <pre>
+                  <code>{functionContent}</code>
+                </pre>
+              </div>
+            )}
+          </div>,
+        );
+      } else if (segment.type === "self_answer") {
+        // 自答标签，使用 ReactMarkdown 渲染内容
+        contentParts.push(
+          <div key={`self-answer-${index}`}>
+            <ReactMarkdown
+              remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
+              rehypePlugins={[
+                RehypeKatex,
+                [
+                  RehypeHighlight,
+                  {
+                    detect: false,
+                    ignoreMissing: true,
+                  },
+                ],
+              ]}
+              components={{
+                pre: PreCode,
+                code: CustomCode,
+                p: (pProps) => <p {...pProps} dir="auto" />,
+                a: (aProps) => {
+                  const href = aProps.href || "";
+                  if (/\.(aac|mp3|opus|wav)$/.test(href)) {
+                    return (
+                      <figure>
+                        <audio controls src={href}></audio>
+                      </figure>
+                    );
+                  }
+                  if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
+                    return (
+                      <video controls width="99.9%">
+                        <source src={href} />
+                      </video>
+                    );
+                  }
+                  const isInternal = /^\/#/i.test(href);
+                  const target = isInternal
+                    ? "_self"
+                    : aProps.target ?? "_blank";
+                  return <a {...aProps} target={target} />;
+                },
+              }}
+            >
+              {segment.content}
+            </ReactMarkdown>
+          </div>,
+        );
+      } else if (segment.type === "incomplete_think") {
+        // 未完成的思考标签，添加折叠功能
+        contentParts.push(
+          <div
+            key={`incomplete-think-${index}`}
+            className={`special-tag ${styles["think-tag"]}`}
+          >
+            <div
+              className={styles["function-header"]}
+              onClick={() => {
+                setExpandedThinks((prev) => ({
+                  ...prev,
+                  [index]: !prev[index],
+                }));
+              }}
+            >
+              <span className={styles["function-name"]}>思考过程</span>
+              <span className={styles["function-status"]}>
+                {expandedThinks[index] ? "折叠" : "展开"}
+              </span>
+            </div>
+
+            {!expandedThinks[index] ? (
+              <div className={styles["function-collapsed"]}>
+                AI 正在思考中...
+              </div>
+            ) : (
+              <div className={styles["function-content"]}>
+                <ReactMarkdown
+                  remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
+                  rehypePlugins={[
+                    RehypeKatex,
+                    [
+                      RehypeHighlight,
+                      {
+                        detect: false,
+                        ignoreMissing: true,
+                      },
+                    ],
+                  ]}
+                  components={{
+                    pre: PreCode,
+                    code: CustomCode,
+                    p: (pProps) => <p {...pProps} dir="auto" />,
+                    a: (aProps) => {
+                      const href = aProps.href || "";
+                      if (/\.(aac|mp3|opus|wav)$/.test(href)) {
+                        return (
+                          <figure>
+                            <audio controls src={href}></audio>
+                          </figure>
+                        );
+                      }
+                      if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
+                        return (
+                          <video controls width="99.9%">
+                            <source src={href} />
+                          </video>
+                        );
+                      }
+                      const isInternal = /^\/#/i.test(href);
+                      const target = isInternal
+                        ? "_self"
+                        : aProps.target ?? "_blank";
+                      return <a {...aProps} target={target} />;
+                    },
+                  }}
+                >
+                  {segment.content}
+                </ReactMarkdown>
+              </div>
+            )}
+          </div>,
+        );
+      } else if (segment.type === "incomplete_function") {
+        // 未完成的函数参数标签
+        contentParts.push(
+          <div
+            key={`incomplete-function-${index}`}
+            className={`special-tag ${styles["function-arguments-tag"]}`}
+          >
+            <div className={styles["function-header"]}>
+              <span className={styles["function-name"]}>函数调用</span>
+              <span className={styles["function-status"]}>生成中...</span>
+            </div>
+            <div className={styles["function-collapsed"]}>
+              函数调用生成中...
+            </div>
+          </div>,
+        );
+      } else if (segment.type === "incomplete_self_answer") {
+        // 未完成的自答标签，使用 ReactMarkdown 渲染内容
+        contentParts.push(
+          <div key={`incomplete-self-answer-${index}`}>
+            <ReactMarkdown
+              remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
+              rehypePlugins={[
+                RehypeKatex,
+                [
+                  RehypeHighlight,
+                  {
+                    detect: false,
+                    ignoreMissing: true,
+                  },
+                ],
+              ]}
+              components={{
+                pre: PreCode,
+                code: CustomCode,
+                p: (pProps) => <p {...pProps} dir="auto" />,
+                a: (aProps) => {
+                  const href = aProps.href || "";
+                  if (/\.(aac|mp3|opus|wav)$/.test(href)) {
+                    return (
+                      <figure>
+                        <audio controls src={href}></audio>
+                      </figure>
+                    );
+                  }
+                  if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
+                    return (
+                      <video controls width="99.9%">
+                        <source src={href} />
+                      </video>
+                    );
+                  }
+                  const isInternal = /^\/#/i.test(href);
+                  const target = isInternal
+                    ? "_self"
+                    : aProps.target ?? "_blank";
+                  return <a {...aProps} target={target} />;
+                },
+              }}
+            >
+              {segment.content}
+            </ReactMarkdown>
+          </div>,
+        );
+      }
+    });
+
+    return <>{contentParts}</>;
+  }
+
+  // 如果没有特殊标签，返回 null，让 ReactMarkdown 处理
+  return null;
+}
+
+// 辅助函数：按照特殊标签分割内容
+function splitContentByTags(
+  content: string,
+): Array<{ type: string; content: string }> {
+  const result: Array<{ type: string; content: string }> = [];
+  let currentIndex = 0;
+
+  // 正则表达式匹配所有完整的特殊标签
+  const tagRegex = /<(think|function_arguments|self_answer)>([^]*?)<\/\1>/g;
+  let match;
+
+  // 处理所有完整的标签
+  while ((match = tagRegex.exec(content)) !== null) {
+    const [fullMatch, tagName, tagContent] = match;
+    const matchIndex = match.index;
+
+    // 添加标签前的普通文本
+    if (matchIndex > currentIndex) {
+      result.push({
+        type: "text",
+        content: content.substring(currentIndex, matchIndex),
+      });
+    }
+
+    // 添加标签内容
+    result.push({
+      type: tagName,
+      content: tagContent,
+    });
+
+    currentIndex = matchIndex + fullMatch.length;
+  }
+
+  // 处理剩余的文本，可能包含未闭合的标签
+  if (currentIndex < content.length) {
+    const remainingContent = content.substring(currentIndex);
+
+    // 检查未闭合的标签
+    const incompleteThinkMatch = /<think>([^]*?)$/.exec(remainingContent);
+    const incompleteFunctionMatch = /<function_arguments>([^]*?)$/.exec(
+      remainingContent,
+    );
+    const incompleteSelfAnswerMatch = /<self_answer>([^]*?)$/.exec(
+      remainingContent,
+    );
+
+    if (incompleteThinkMatch) {
+      // 有未闭合的 <think> 标签
+      const matchIndex = incompleteThinkMatch.index;
+
+      // 添加标签前的普通文本
+      if (matchIndex > 0) {
+        result.push({
+          type: "text",
+          content: remainingContent.substring(0, matchIndex),
+        });
+      }
+
+      // 添加未闭合的标签内容
+      result.push({
+        type: "incomplete_think",
+        content: incompleteThinkMatch[1],
+      });
+    } else if (incompleteFunctionMatch) {
+      // 有未闭合的 <function_arguments> 标签
+      const matchIndex = incompleteFunctionMatch.index;
+
+      // 添加标签前的普通文本
+      if (matchIndex > 0) {
+        result.push({
+          type: "text",
+          content: remainingContent.substring(0, matchIndex),
+        });
+      }
+
+      // 添加未闭合的标签内容
+      result.push({
+        type: "incomplete_function",
+        content: incompleteFunctionMatch[1],
+      });
+    } else if (incompleteSelfAnswerMatch) {
+      // 有未闭合的 <self_answer> 标签
+      const matchIndex = incompleteSelfAnswerMatch.index;
+
+      // 添加标签前的普通文本
+      if (matchIndex > 0) {
+        result.push({
+          type: "text",
+          content: remainingContent.substring(0, matchIndex),
+        });
+      }
+
+      // 添加未闭合的标签内容
+      result.push({
+        type: "incomplete_self_answer",
+        content: incompleteSelfAnswerMatch[1],
+      });
+    } else {
+      // 没有未闭合的标签，全部作为普通文本
+      result.push({
+        type: "text",
+        content: remainingContent,
+      });
+    }
+  }
+
+  return result;
+}
+
 function _MarkDownContent(props: { content: string }) {
   const escapedContent = useMemo(() => {
     return tryWrapHtmlCode(escapeBrackets(props.content));
   }, [props.content]);
 
+  // 检查内容中是否包含特殊标签或标签的开始部分
+  const hasSpecialTags =
+    props.content.includes("<think>") ||
+    props.content.includes("</think>") ||
+    props.content.includes("<function_arguments>") ||
+    props.content.includes("</function_arguments>");
+
+  // 如果包含特殊标签，使用自定义渲染
+  if (hasSpecialTags) {
+    return <CustomMarkdownContent content={props.content} />;
+  }
+
+  // 否则使用标准的 ReactMarkdown 渲染
   return (
     <ReactMarkdown
       remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}

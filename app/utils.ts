@@ -233,6 +233,13 @@ export function isMacOS(): boolean {
   return false;
 }
 
+// 处理特殊标签，如<think>和<function_arguments>
+export function processSpecialTags(content: string) {
+  // 我们现在在 CustomMarkdownContent 组件中处理特殊标签
+  // 这个函数保留以保持兼容性，但不再进行处理
+  return content;
+}
+
 export function getMessageTextContent(message: RequestMessage) {
   if (typeof message.content === "string") {
     return message.content;

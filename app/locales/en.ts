@@ -664,6 +664,23 @@ const en: LocaleType = {
   FineTuned: {
     Sysmessage: "You are an assistant that",
   },
+  // Add
+  FileManage: {
+    Name: "File Manage",
+    Page: {
+      Title: "File Manage",
+      Search: "input search keywords",
+      SubTitle: (count: number) => `Find ${count} pictures`,
+    },
+  },
+  TodoList: {
+    Name: "Todo List",
+    Page: {
+      Title: "Todo List",
+      Search: "input search keywords",
+      SubTitle: (count: number) => `Totally ${count} Todo`,
+    },
+  },
   SearchChat: {
     Name: "Search",
     Page: {

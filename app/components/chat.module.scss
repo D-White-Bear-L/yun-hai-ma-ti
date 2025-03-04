@@ -677,6 +677,27 @@
   }
 }
 
+// 语音输入按钮
+.chat-input-voice {
+  background-color: var(--primary); // 发送按钮背景颜色
+  color: white; // 发送按钮文字颜色
+
+  position: absolute; // 绝对定位
+  right: 100px; // 右对齐
+  bottom: 32px; // 底部对齐
+
+}
+
+@media only screen and (max-width: 600px) { // 移动端样式
+  .chat-input {
+    font-size: 16px; // 字体大小
+  }
+
+  .chat-input-voice {
+    bottom: 30px;
+  }
+}
+
 .shortcut-key-container {
   padding: 10px;
   overflow-y: auto;
@@ -750,4 +771,88 @@
       transform: translateX(0);
     }
   }
+}
+
+// 特殊标签样式
+.think-tag {
+  background-color: #f0f7ff;
+  border-left: 3px solid #3498db;
+  padding: 8px 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+  color: #555;
+  
+  // 修改流式生成效果，只在折叠状态下显示
+  &:last-child .function-collapsed::after {
+    content: '▌';
+    display: inline-block;
+    animation: blink 1s infinite;
+  }
+  
+  // 为思考标签添加特殊样式
+  .function-name {
+    color: #3498db;
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.function-arguments-tag {
+  background-color: #f7f0ff;
+  border-left: 3px solid #9b59b6;
+  padding: 8px 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  
+  // 添加流式生成效果
+  &:last-child .function-collapsed::after {
+    content: '▌';
+    display: inline-block;
+    animation: blink 1s infinite;
+  }
+}
+
+// 函数头部样式
+.function-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #ddd;
+  margin-bottom: 8px;
+}
+
+.function-name {
+  font-weight: bold;
+  color: #9b59b6;
+}
+
+.function-status {
+  font-size: 12px;
+  color: #888;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+.function-collapsed {
+  color: #888;
+  font-style: italic;
+  padding: 4px 0;
+}
+
+.function-content {
+  padding-top: 8px;
+  overflow-x: auto;
 }
