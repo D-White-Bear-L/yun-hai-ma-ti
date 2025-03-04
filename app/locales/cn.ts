@@ -669,7 +669,7 @@ const cn = {
     Page: {
       Title: "待办",
       Search: "输入搜索关键词",
-      SubTitle: (count: number) => `共 ${count} 条待办`,
+      SubTitle: (count: number) => `共 ${count} 项待办`,
     },
   },
   SearchChat: {

@@ -1,7 +1,7 @@
 // 引入组件
 import { ErrorBoundary } from "./error"; // 错误边界
 import styles from "./todo-list.module.scss";
-// 语言包
+import Locale from "../locales"; // 语言包
 import { IconButton } from "./button"; // 按钮
 import CloseIcon from "../icons/close.svg"; // 关闭图标
 import { useNavigate } from "react-router-dom"; // 路由
@@ -164,8 +164,8 @@ export function TodoList() {
         <div className="window-header">
           <div className="window-header-title">
             <div className="window-header-main-title">待办</div>
-            <div className="window-header-sub-title">
-              管理您的日常任务和计划
+            <div className="window-header-submai-title">
+              {Locale.TodoList.Page.SubTitle(sortedTodos.length)}
             </div>
           </div>
           <div className="window-actions">
