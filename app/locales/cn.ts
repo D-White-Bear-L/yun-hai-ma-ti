@@ -657,11 +657,11 @@ const cn = {
   },
   // Add
   FileManage: {
-    Name: "文件管理",
+    Name: "云记忆展示",
     Page: {
-      Title: "文件管理",
+      Title: "云记忆展示",
       Search: "输入搜索关键词",
-      SubTitle: (count: number) => `共 ${count} 张图片`,
+      SubTitle: (count: number) => `共 ${count} 条记忆记录`,
     },
   },
   TodoList: {

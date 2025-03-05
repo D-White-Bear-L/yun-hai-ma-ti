@@ -36,8 +36,8 @@ const DISCOVERY = [
   { name: Locale.FileManage.Page.Title, path: Path.FileManage },
   { name: Locale.TodoList.Page.Title, path: Path.TodoList },
   { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
-  { name: Locale.Plugin.Name, path: Path.Plugins },
-  { name: "Stable Diffusion", path: Path.Sd },
+  // { name: Locale.Plugin.Name, path: Path.Plugins },
+  // { name: "Stable Diffusion", path: Path.Sd },
 ];
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {

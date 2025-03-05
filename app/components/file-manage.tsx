@@ -77,7 +77,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
       </div>
     );
   } else {
-    // else 后面有没有{}也可
     return <Result status="404" subTitle="暂无图片诶~" />;
   }
 };
@@ -123,9 +122,9 @@ export function FileManage() {
               {Locale.FileManage.Page.Title}
             </div>
             {/* 副标题 */}
-            {/* <div className="window-header-submai-title">
-              {Locale.FileManage.Page.SubTitle(100)}
-            </div> */}
+            <div className="window-header-submai-title">
+              {Locale.FileManage.Page.SubTitle(images.length + file.length)}
+            </div>
           </div>
           {/* 窗口操作按钮 */}
           <div className="window-actions">
@@ -143,12 +142,12 @@ export function FileManage() {
         <div className={styles["mask-page-body"]}>
           {/* 图集展示 */}
           <Space direction="vertical" size="middle" style={{ display: "flex" }}>
-            <Card title="图集展示" size="small">
+            <Card title="图像记忆" size="small">
               <div className="Image">
                 <ImageGallery images={images} />
               </div>
             </Card>
-            <Card title="其他文件" size="small">
+            <Card title="其他记忆" size="small">
               <OtherFile />
             </Card>
           </Space>

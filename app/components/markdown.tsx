@@ -280,7 +280,7 @@ function CustomMarkdownContent({ content }: { content: string }) {
 
   // 检查内容中是否包含特殊标签
   const hasThinkTag = content.includes("<think>");
-  const hasFunctionArgumentsTag = content.includes("<function_arguments>");
+  const hasFunctionArgumentsTag = content.includes("<tools_arguments>");
   const hasSelfAnswerTag = content.includes("<self_answer>");
 
   // 如果包含特殊标签，使用自定义渲染
@@ -410,7 +410,7 @@ function CustomMarkdownContent({ content }: { content: string }) {
             )}
           </div>,
         );
-      } else if (segment.type === "function_arguments") {
+      } else if (segment.type === "tools_arguments") {
         // 函数参数标签
         let functionName = "函数调用";
         let functionContent = segment.content;
@@ -660,7 +660,7 @@ function splitContentByTags(
   let currentIndex = 0;
 
   // 正则表达式匹配所有完整的特殊标签
-  const tagRegex = /<(think|function_arguments|self_answer)>([^]*?)<\/\1>/g;
+  const tagRegex = /<(think|tools_arguments|self_answer)>([^]*?)<\/\1>/g;
   let match;
 
   // 处理所有完整的标签
@@ -691,7 +691,7 @@ function splitContentByTags(
 
     // 检查未闭合的标签
     const incompleteThinkMatch = /<think>([^]*?)$/.exec(remainingContent);
-    const incompleteFunctionMatch = /<function_arguments>([^]*?)$/.exec(
+    const incompleteFunctionMatch = /<tools_arguments>([^]*?)$/.exec(
       remainingContent,
     );
     const incompleteSelfAnswerMatch = /<self_answer>([^]*?)$/.exec(
@@ -716,7 +716,7 @@ function splitContentByTags(
         content: incompleteThinkMatch[1],
       });
     } else if (incompleteFunctionMatch) {
-      // 有未闭合的 <function_arguments> 标签
+      // 有未闭合的 <tools_arguments> 标签
       const matchIndex = incompleteFunctionMatch.index;
 
       // 添加标签前的普通文本
@@ -770,8 +770,8 @@ function _MarkDownContent(props: { content: string }) {
   const hasSpecialTags =
     props.content.includes("<think>") ||
     props.content.includes("</think>") ||
-    props.content.includes("<function_arguments>") ||
-    props.content.includes("</function_arguments>");
+    props.content.includes("<tools_arguments>") ||
+    props.content.includes("</tools_arguments>");
 
   // 如果包含特殊标签，使用自定义渲染
   if (hasSpecialTags) {

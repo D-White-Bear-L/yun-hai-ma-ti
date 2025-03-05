@@ -666,11 +666,11 @@ const en: LocaleType = {
   },
   // Add
   FileManage: {
-    Name: "File Manage",
+    Name: "Cloud memory Show",
     Page: {
-      Title: "File Manage",
+      Title: "Cloud memory Show",
       Search: "input search keywords",
-      SubTitle: (count: number) => `Find ${count} pictures`,
+      SubTitle: (count: number) => `Totally ${count} cloud-memory record`,
     },
   },
   TodoList: {
