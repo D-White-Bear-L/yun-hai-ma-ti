@@ -471,6 +471,11 @@
 .chat-message-item-image {
   width: 100%;
   margin-top: 10px;
+  // add
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
 }
 
 .chat-message-item-images {
@@ -487,6 +492,11 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  // add
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
 }
 
 .chat-message-item-image,
