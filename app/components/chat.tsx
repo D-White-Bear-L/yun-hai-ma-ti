@@ -9,6 +9,10 @@ import React, {
   useState,
 } from "react";
 
+// 语音识别图标
+import MicrophoneIcon from "../icons/microphone.svg";
+import MicrophoneStopIcon from "../icons/microphone_stop.svg";
+
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
@@ -1034,6 +1038,104 @@ function _Chat() {
   const [attachImages, setAttachImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
 
+  const [isRecognizing, setIsRecognizing] = useState(false);
+  let tempDisplay = "";
+
+  // 语音识别
+  const recognitionRef = useRef<any>(null); //<SpeechRecognition | null > will label error, so just use <any>, luckily it works
+  useEffect(() => {
+    // 检查浏览器是否支持语音识别
+    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true; // 连续识别
+      recognitionRef.current.interimResults = true; // 允许中间结果，否则直接返回整句话
+      recognitionRef.current.lang = "zh-CN"; // 设置语言为中文
+
+      // 监听识别结果
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = ""; // 累积所有的最终结果
+        let interimTranscript = ""; // 累积所有的中间结果，供实时显示
+
+        // 循环更新结果，并且是不是中间结果才更新，即保证每次是最终的整句话才叠加。这里只能循环Index叠加，不能直接对等然后更新。
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          // 遍历event.resultIndex到event.results.length-1
+          let transcript = event.results[i][0].transcript;
+          // console.log("transcript：", transcript);
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+            tempDisplay += finalTranscript;
+            setUserInput(tempDisplay);
+          } else {
+            interimTranscript += transcript;
+            setUserInput(tempDisplay + interimTranscript);
+          }
+          // console.log("interimTranscript：", interimTranscript); // test
+          // console.log("finalTranscript：", finalTranscript); // test
+        }
+      };
+
+      recognitionRef.current.onend = () => {
+        //结束设置：点击结束stop/识别到没有声音
+        console.log("语音识别结束");
+        showToast("语音识别已停止...");
+        // 切换按钮的识别状态
+        doSubmit(userInput); // 提交输入内容 ，but not works
+        setIsRecognizing((prev) => !prev);
+      };
+    } else {
+      console.error("该浏览器不支持语音识别");
+      showToast(
+        "您的浏览器不支持语音识别功能，请尝试使用 Chrome 等现代浏览器。",
+      ); // 提示用户浏览器不支持语音识别
+    }
+  }, []);
+
+  // 开始识别
+  const startRecognition = () => {
+    if (recognitionRef.current && isRecognizing == false) {
+      // 如果语音识别对象存在且未开始识别
+      recognitionRef.current.start(); // 开始语音识别
+      showToast("正在识别，请说...");
+      // 一直显示正在识别
+      console.log("语音识别开始");
+      // 切换按钮的识别状态
+      setIsRecognizing((prev) => !prev);
+    }
+  };
+  // 结束识别
+  const stopRecognition = () => {
+    if (recognitionRef.current && isRecognizing == true) {
+      // 如果语音识别对象存在且正在识别
+      recognitionRef.current.stop(); // 停止语音识别
+    }
+  };
+
+  // 语音识别按钮
+  const chat_input_voice_button = () => {
+    if (!isRecognizing) {
+      return (
+        <IconButton
+          icon={<MicrophoneIcon />}
+          className={styles["chat-input-voice"]}
+          type="primary"
+          onClick={startRecognition}
+        />
+      );
+    } else if (isRecognizing) {
+      return (
+        <IconButton
+          icon={<MicrophoneStopIcon />}
+          className={styles["chat-input-voice"]}
+          style={{ backgroundColor: "#FF5E6C" }}
+          type="primary"
+          onClick={stopRecognition}
+        />
+      );
+    }
+  };
+
   // prompt hints
   const promptStore = usePromptStore();
   const [promptHints, setPromptHints] = useState<RenderPrompt[]>([]);
@@ -1103,6 +1205,7 @@ function _Chat() {
   };
 
   const doSubmit = (userInput: string) => {
+    tempDisplay = ""; // 清空语音输入记录
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
@@ -2116,6 +2219,8 @@ function _Chat() {
                     })}
                   </div>
                 )}
+                {/* 语音输入按钮 */}
+                {chat_input_voice_button()}
                 <IconButton
                   icon={<SendWhiteIcon />}
                   text={Locale.Chat.Send}
