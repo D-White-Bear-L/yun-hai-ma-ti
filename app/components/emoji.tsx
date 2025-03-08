@@ -60,11 +60,17 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
       modelName.startsWith("o3")
     ) {
       LlmIcon = BotIconOpenAI;
-    } else if (modelName.startsWith("gemini")) {
+    } else if (
+      modelName.startsWith("gemini") ||
+      modelName.startsWith("google")
+    ) {
       LlmIcon = BotIconGemini;
     } else if (modelName.startsWith("gemma")) {
       LlmIcon = BotIconGemma;
-    } else if (modelName.startsWith("claude")) {
+    } else if (
+      modelName.startsWith("claude") ||
+      modelName.startsWith("anthropic")
+    ) {
       LlmIcon = BotIconClaude;
     } else if (modelName.toLowerCase().includes("llama")) {
       LlmIcon = BotIconMeta;
