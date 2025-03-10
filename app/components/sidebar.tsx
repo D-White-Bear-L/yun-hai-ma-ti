@@ -337,6 +337,20 @@ export function SideBar(props: { className?: string }) {
                 />
               </Link>
             </div>
+            <div className={styles["sidebar-action"]}>
+              <IconButton
+                aria={Locale.Settings.Title}
+                icon={<DeleteIcon />}
+                shadow
+                onClick={async () => {
+                  // empty the state of Login
+                  localStorage.removeItem("isLoggedIn");
+                  localStorage.removeItem("username");
+                  // flash the page and redirect to login page
+                  window.location.reload();
+                }}
+              />
+            </div>
             {/* <div className={styles["sidebar-action"]}>
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
                 <IconButton

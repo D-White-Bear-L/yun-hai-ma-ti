@@ -5,7 +5,8 @@ require("../polyfill");
 import { useEffect, useState } from "react";
 import styles from "./home.module.scss";
 
-import BotIcon from "../icons/bot.svg";
+// import BotIcon from "../icons/bot.svg";
+import BotIcon from "../icons/ALogo.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 
 import { getCSSVar, useMobileScreen } from "../utils";
@@ -82,7 +83,7 @@ const McpMarketPage = dynamic(
   },
 );
 
-// 文件管理
+// file-manage
 const FileManage = dynamic(
   async () => (await import("./file-manage")).FileManage,
   {
@@ -90,8 +91,12 @@ const FileManage = dynamic(
   },
 );
 
-// 待办
+// todo-list
 const TodoList = dynamic(async () => (await import("./todo-list")).TodoList, {
+  loading: () => <Loading noLogo />,
+});
+
+const Login = dynamic(async () => (await import("./login")).Login, {
   loading: () => <Loading noLogo />,
 });
 

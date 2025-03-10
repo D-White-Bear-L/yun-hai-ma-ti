@@ -215,7 +215,7 @@ export function TodoList() {
                     }`}
                     disabled={newTodo.trim() === ""}
                   >
-                    添加
+                    添加+
                   </button>
                 </div>
               </div>
