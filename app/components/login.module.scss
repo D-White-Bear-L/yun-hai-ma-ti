@@ -39,35 +39,10 @@
     }
 
     span {
-        font-size: 1rem;
+        font-size: 1.5rem;
         color: #666;
     }
 }
-
-// // 添加移动端适配
-// @media screen and (max-width: 768px) {
-//   .login-header {
-//     margin-bottom: 3rem;
-
-//     .logo-title {
-//       .logo {
-//         width: 3.5rem;
-//         height: 3.5rem;
-//         margin-right: 0.8rem;
-//       }
-
-//       h1 {
-//         font-size: 2.8rem;
-//       }
-//     }
-
-//     span {
-//       font-size: 1.2rem;
-//       margin-top: 0.5rem;
-//       display: block;
-//     }
-//   }
-// }
 
 .login-box {
     background: var(--white);

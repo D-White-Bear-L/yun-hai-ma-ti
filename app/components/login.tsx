@@ -22,68 +22,72 @@ export function Loading(props: { noLogo?: boolean }) {
 }
 
 export function Login() {
-  // 移除 onLoginSuccess 属性
+  const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
-  const { login } = useAuth(); // 使用 auth context
+  const { login } = useAuth();
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-    if (usernameError) setUsernameError("");
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-    if (passwordError) setPasswordError("");
-  };
-
-  const handleLogin = () => {
+  const handleSubmit = () => {
     let isValid = true;
 
     if (!username.trim()) {
       setUsernameError("请输入用户名!");
       isValid = false;
-    } else {
-      setUsernameError("");
     }
 
     if (!password.trim()) {
       setPasswordError("请输入密码!");
       isValid = false;
-    } else {
-      setPasswordError("");
+    }
+
+    if (isRegister) {
+      if (!confirmPassword.trim()) {
+        setConfirmPasswordError("请确认密码!");
+        isValid = false;
+      } else if (password !== confirmPassword) {
+        setConfirmPasswordError("两次输入的密码不一致!");
+        isValid = false;
+      }
     }
 
     if (isValid) {
-      if (username === "admin" && password === "123456") {
-        setIsLoading(true);
-
-        // 使用 auth context 的 login 方法
+      setIsLoading(true);
+      if (isRegister) {
+        // 注册逻辑
         setTimeout(() => {
-          login(username); // 这会自动更新登录状态
-          console.log("登录成功");
-        }, 200);
+          setRegisterSuccess(true);
+          console.log("注册成功");
+          setTimeout(() => {
+            setIsRegister(false);
+            setIsLoading(false);
+            setRegisterSuccess(false);
+          }, 1500);
+        }, 1000);
       } else {
-        setPasswordError("用户名或密码错误!");
-        console.log("登录失败，用户名或密码错误");
+        // 登录逻辑
+        if (username === "admin" && password === "123456") {
+          setTimeout(() => {
+            login(username);
+            console.log("登录成功");
+          }, 200);
+        } else {
+          setPasswordError("用户名或密码错误!");
+          setIsLoading(false);
+        }
       }
     }
   };
-
-  // 如果正在加载，显示加载组件
-  if (isLoading) {
-    console.log("显示加载组件");
-    return <Loading />;
-  }
-
-  // 添加回车键处理函数
+  // 在 Login 组件中添加回车键处理函数
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    field: "username" | "password",
+    field: "username" | "password" | "confirmPassword",
   ) => {
     if (e.key === "Enter") {
       if (field === "username") {
@@ -96,8 +100,8 @@ export function Login() {
           ) as HTMLInputElement;
           passwordInput?.focus();
         } else {
-          // 触发登录
-          handleLogin();
+          // 触发提交
+          handleSubmit();
         }
       } else if (field === "password") {
         if (!password.trim()) {
@@ -109,9 +113,22 @@ export function Login() {
             'input[type="text"]',
           ) as HTMLInputElement;
           usernameInput?.focus();
+        } else if (isRegister) {
+          // 如果是注册模式，聚焦确认密码输入框
+          const confirmPasswordInput = document.querySelectorAll(
+            'input[type="password"]',
+          )[1] as HTMLInputElement;
+          confirmPasswordInput?.focus();
         } else {
-          // 触发登录
-          handleLogin();
+          // 触发提交
+          handleSubmit();
+        }
+      } else if (field === "confirmPassword" && isRegister) {
+        if (!confirmPassword.trim()) {
+          setConfirmPasswordError("请确认密码!");
+        } else {
+          // 触发提交
+          handleSubmit();
         }
       }
     }
@@ -125,7 +142,11 @@ export function Login() {
             <Logo className={style["logo"]} />
             <h1>云海马体</h1>
           </div>
-          <span>您的记忆增强助理</span>
+          <span>
+            {isRegister
+              ? "创建您的账户 即刻拥有云记忆增强助理"
+              : "登录您的账户 即刻拥有云记忆增强助理"}
+          </span>
         </div>
         <div className={style["login-box"]}>
           <div className={style["input-group"]}>
@@ -135,7 +156,10 @@ export function Login() {
                 type="text"
                 placeholder="用户名"
                 value={username}
-                onChange={handleUsernameChange}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setUsernameError("");
+                }}
                 onKeyDown={(e) => handleKeyDown(e, "username")}
               />
               {usernameError && (
@@ -148,20 +172,71 @@ export function Login() {
                 type="password"
                 placeholder="密码"
                 value={password}
-                onChange={handlePasswordChange}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
                 onKeyDown={(e) => handleKeyDown(e, "password")}
               />
               {passwordError && (
                 <div className={style["error-message"]}>{passwordError}</div>
               )}
             </div>
-            <button className={style["login-button"]} onClick={handleLogin}>
-              <span>登录</span>
+            {isRegister && (
+              <div className={style["input-field"]}>
+                <FaLock className={style["input-icon"]} />
+                <input
+                  type="password"
+                  placeholder="确认密码"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setConfirmPasswordError("");
+                  }}
+                  onKeyDown={(e) => handleKeyDown(e, "confirmPassword")}
+                />
+                {confirmPasswordError && (
+                  <div className={style["error-message"]}>
+                    {confirmPasswordError}
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              className={style["login-button"]}
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              <span>
+                {isLoading
+                  ? registerSuccess
+                    ? "注册成功，正在返回登录..."
+                    : isRegister
+                    ? "注册中..."
+                    : "登录中..."
+                  : isRegister
+                  ? "注册"
+                  : "登录"}
+              </span>
             </button>
           </div>
           <div className={style["login-footer"]}>
             <a href="#">忘记密码？</a>
-            <a href="#">注册账号</a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsRegister(!isRegister);
+                setUsername("");
+                setPassword("");
+                setConfirmPassword("");
+                setUsernameError("");
+                setPasswordError("");
+                setConfirmPasswordError("");
+              }}
+            >
+              {isRegister ? "返回登录" : "注册账号"}
+            </a>
           </div>
         </div>
       </div>
