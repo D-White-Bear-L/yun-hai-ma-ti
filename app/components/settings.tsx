@@ -49,8 +49,7 @@ import Locale, {
   changeLang,
   getLang,
 } from "../locales";
-import { copyToClipboard, clientUpdate, semverCompare } from "../utils";
-import Link from "next/link";
+import { copyToClipboard, semverCompare } from "../utils";
 import {
   Anthropic,
   Azure,
@@ -87,7 +86,6 @@ import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
 import { TTSConfigList } from "./tts-config";
-import { RealtimeConfigList } from "./realtime-chat/realtime-config";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -1511,7 +1509,7 @@ export function Settings() {
             </Popover>
           </ListItem>
 
-          <ListItem
+          {/* <ListItem
             title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
             subTitle={
               checkingUpdate
@@ -1542,7 +1540,7 @@ export function Settings() {
                 onClick={() => checkUpdate(true)}
               />
             )}
-          </ListItem>
+          </ListItem> */}
 
           <ListItem title={Locale.Settings.SendKey}>
             <Select
@@ -1776,8 +1774,8 @@ export function Settings() {
         </List>
 
         <List id={SlotID.CustomModel}>
-          {saasStartComponent}
-          {accessCodeComponent}
+          {/* {saasStartComponent} */}
+          {/* {accessCodeComponent} */}
 
           {!accessStore.hideUserApiKey && (
             <>
@@ -1888,7 +1886,7 @@ export function Settings() {
         {shouldShowPromptModal && (
           <UserPromptModal onClose={() => setShowPromptModal(false)} />
         )}
-        <List>
+        {/* <List>
           <RealtimeConfigList
             realtimeConfig={config.realtimeConfig}
             updateConfig={(updater) => {
@@ -1899,7 +1897,7 @@ export function Settings() {
               );
             }}
           />
-        </List>
+        </List> */}
         <List>
           <TTSConfigList
             ttsConfig={config.ttsConfig}

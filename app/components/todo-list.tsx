@@ -11,10 +11,10 @@ import { useState, useEffect } from "react";
 
 // 定义待办事项类型
 interface TodoItem {
-  id: number;
+  id: number; // Date.now()
   text: string;
   completed: boolean;
-  dueDate: string; // 添加截止日期字段
+  dueDate: string; // 截止日期字段
 }
 
 // todo

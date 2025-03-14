@@ -28,21 +28,21 @@ const images = require
   .map((image) => image.replace("./", "/mock/image/"));
 
 const file: any[] = [
-  {
-    name: "file1.txt",
-    size: "1KB",
-    type: "text/plain",
-  },
-  {
-    name: "file2.pdf",
-    size: "2MB",
-    type: "application/pdf",
-  },
-  {
-    name: "file3.jpg",
-    size: "3MB",
-    type: "image/jpeg",
-  },
+  // {
+  //   name: "file1.txt",
+  //   size: "1KB",
+  //   type: "text/plain",
+  // },
+  // {
+  //   name: "file2.pdf",
+  //   size: "2MB",
+  //   type: "application/pdf",
+  // },
+  // {
+  //   name: "file3.jpg",
+  //   size: "3MB",
+  //   type: "image/jpeg",
+  // },
 ];
 
 // 图片展示接口

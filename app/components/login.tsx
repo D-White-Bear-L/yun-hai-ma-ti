@@ -11,6 +11,8 @@ import BotIcon from "../icons/ALogo.svg";
 import styles from "./home.module.scss";
 // 导入useAuth
 import { useAuth } from "../context/auth-context";
+// 导入API函数
+import { loginApi, registerApi } from "../client/auth";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -34,7 +36,7 @@ export function Login() {
 
   const { login } = useAuth();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let isValid = true;
 
     if (!username.trim()) {
@@ -59,28 +61,37 @@ export function Login() {
 
     if (isValid) {
       setIsLoading(true);
-      if (isRegister) {
-        // 注册逻辑
-        setTimeout(() => {
-          setRegisterSuccess(true);
-          console.log("注册成功");
-          setTimeout(() => {
-            setIsRegister(false);
+      try {
+        if (isRegister) {
+          // 调用注册API
+          const result = await registerApi(username, password);
+          if (result.success) {
+            setRegisterSuccess(true);
+            console.log("注册成功");
+            setTimeout(() => {
+              setIsRegister(false);
+              setIsLoading(false);
+              setRegisterSuccess(false);
+            }, 1500);
+          } else {
+            setUsernameError(result.message);
             setIsLoading(false);
-            setRegisterSuccess(false);
-          }, 1500);
-        }, 1000);
-      } else {
-        // 登录逻辑
-        if (username === "admin" && password === "123456") {
-          setTimeout(() => {
+          }
+        } else {
+          // 调用登录API
+          const result = await loginApi(username, password);
+          if (result.success) {
             login(username);
             console.log("登录成功");
-          }, 200);
-        } else {
-          setPasswordError("用户名或密码错误!");
-          setIsLoading(false);
+          } else {
+            setPasswordError(result.message);
+            setIsLoading(false);
+          }
         }
+      } catch (error) {
+        console.error("请求失败:", error);
+        setPasswordError("网络请求失败，请稍后重试");
+        setIsLoading(false);
       }
     }
   };

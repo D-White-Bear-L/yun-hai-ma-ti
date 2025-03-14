@@ -38,7 +38,7 @@ import ConfirmIcon from "../icons/confirm.svg";
 import CloseIcon from "../icons/close.svg";
 import CancelIcon from "../icons/cancel.svg";
 import ImageIcon from "../icons/image.svg";
-
+import HeadphoneIcon from "../icons/headphone.svg";
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
@@ -834,13 +834,13 @@ export function ChatActions(props: {
         {!isMobileScreen && <MCPAction />}
       </>
       <div className={styles["chat-input-actions-end"]}>
-        {/* {config.realtimeConfig.enable && (
+        {config.realtimeConfig.enable && (
           <ChatAction
             onClick={() => props.setShowChatSidePanel(true)}
             text={"Realtime Chat"}
             icon={<HeadphoneIcon />}
           />
-        )} */}
+        )}
       </div>
     </div>
   );
