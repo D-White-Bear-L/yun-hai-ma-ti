@@ -338,11 +338,11 @@ function CustomMarkdownContent({ content }: { content: string }) {
             {segment.content}
           </ReactMarkdown>,
         );
-      } else if (segment.type === "think") {
+      } else if (segment.type === "thought") {
         // 思考标签，添加折叠功能
         contentParts.push(
           <div
-            key={`think-${index}`}
+            key={`thought-${index}`}
             className={`special-tag ${styles["think-tag"]}`}
           >
             <div
@@ -355,9 +355,11 @@ function CustomMarkdownContent({ content }: { content: string }) {
               }}
             >
               <span className={styles["function-name"]}>思考过程</span>
-              <span className={styles["function-status"]}>
-                {expandedThinks[index] ? "折叠" : "展开"}
-              </span>
+              <span
+                className={`${styles["function-status"]} ${
+                  expandedThinks[index] ? styles["expanded"] : ""
+                }`}
+              />
             </div>
 
             {!expandedThinks[index] ? (
@@ -440,9 +442,11 @@ function CustomMarkdownContent({ content }: { content: string }) {
               }}
             >
               <span className={styles["function-name"]}>{functionName}</span>
-              <span className={styles["function-status"]}>
-                {expandedFunctions[index] ? "折叠" : "展开"}
-              </span>
+              <span
+                className={`${styles["function-status"]} ${
+                  expandedFunctions[index] ? styles["expanded"] : ""
+                }`}
+              />
             </div>
 
             {!expandedFunctions[index] ? (
@@ -521,8 +525,12 @@ function CustomMarkdownContent({ content }: { content: string }) {
               }}
             >
               <span className={styles["function-name"]}>思考过程</span>
-              <span className={styles["function-status"]}>
-                {expandedThinks[index] ? "折叠" : "展开"}
+              <span
+                className={`${styles["function-status"]} ${
+                  expandedThinks[index] ? styles["expanded"] : ""
+                }`}
+              >
+                展开
               </span>
             </div>
 

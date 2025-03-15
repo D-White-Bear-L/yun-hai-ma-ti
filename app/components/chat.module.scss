@@ -499,7 +499,7 @@
   height: auto;
 }
 
-.chat-message-item-image,
+.chat-message-item,
 .chat-message-item-image-multi {
   box-sizing: border-box;
   border-radius: 10px;
@@ -783,47 +783,164 @@
   }
 }
 
-// 特殊标签样式
-.think-tag {
-  background-color: #f0f7ff;
-  border-left: 3px solid #3498db;
-  padding: 8px 12px;
-  margin: 8px 0;
-  border-radius: 4px;
-  color: #555;
+// 修改折叠内容样式
+.function-collapsed {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: var(--black);
   
-  // 修改流式生成效果，只在折叠状态下显示
-  &:last-child .function-collapsed::after {
-    content: '▌';
-    display: inline-block;
-    animation: blink 1s infinite;
-  }
-  
-  // 为思考标签添加特殊样式
-  .function-name {
-    color: #3498db;
+  svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+// 统一展开内容样式
+.function-content {
+  padding: 10px 16px;
+  overflow-x: auto;
 }
 
+// ================ Markdown 特殊标签样式 ================
+// 统一特殊标签的基础样式
+.think-tag,
 .function-arguments-tag {
-  background-color: #f7f0ff;
-  border-left: 3px solid #9b59b6;
-  padding: 8px 12px;
-  margin: 8px 0;
-  border-radius: 4px;
-  font-family: monospace;
-  white-space: pre-wrap;
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: var(--font-family);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+// 统一标签头部样式
+.function-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  border-bottom: 1px dashed #ddd;
+  margin-bottom: 8px;
   
-  // 添加流式生成效果
-  &:last-child .function-collapsed::after {
-    content: '▌';
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+// 统一状态标签样式
+.function-status {
+  font-size: 12px;
+  color: #888;
+  padding: 4px 8px;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  
+  &::after {
+    content: "";
     display: inline-block;
-    animation: blink 1s infinite;
+    width: 8px;
+    height: 8px;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.3s ease;
+    margin-left: 6px;
+  }
+  
+  &.expanded::after {
+    transform: rotate(-135deg) translateY(-2px);
+  }
+  
+  &:hover {
+    color: var(--primary);
+    background-color: rgba(255, 255, 255, 0.95);
+    
+    &::after {
+      border-color: var(--primary);
+    }
+  }
+}
+
+// 统一折叠内容样式
+.function-collapsed {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+  padding: 10px 16px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+// 统一展开内容样式
+.function-content {
+  padding: 10px 16px;
+  overflow-x: auto;
+}
+
+// 思考过程标签样式
+.think-tag {
+  border-left: 4px solid #4e89e8;
+  background-color: rgba(78, 137, 232, 0.05);
+  
+  .function-header {
+    color: #4e89e8;
+    background-color: rgba(78, 137, 232, 0.1);
+  }
+  
+  .function-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #4e89e8;
+  }
+  
+  .function-collapsed {
+    background-color: rgba(78, 137, 232, 0.03);
+  }
+  
+  .function-content {
+    background-color: rgba(78, 137, 232, 0.03);
+  }
+}
+
+// 函数调用标签样式
+.function-arguments-tag {
+  border-left: 4px solid #9c27b0;
+  background-color: rgba(156, 39, 176, 0.05);
+  
+  .function-header {
+    color: #9c27b0;
+    background-color: rgba(156, 39, 176, 0.1);
+  }
+  
+  .function-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #9c27b0;
+  }
+  
+  .function-collapsed {
+    background-color: rgba(156, 39, 176, 0.03);
+  }
+  
+  .function-content {
+    background-color: rgba(156, 39, 176, 0.03);
+    
+    pre {
+      margin: 0;
+      background-color: rgba(0, 0, 0, 0.03);
+      border-radius: 4px;
+    }
+    
+    code {
+      font-family: var(--font-family-mono);
+      font-size: 13px;
+    }
   }
 }
 

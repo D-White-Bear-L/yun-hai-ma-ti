@@ -90,3 +90,23 @@
   background-color: #f5f5f5;
   border-radius: 4px;
 }
+
+// 添加一个更美观的错误消息样式
+.errorMessage {
+  background-color: rgba(255, 59, 48, 0.1);
+  border-left: 4px solid #ff3b30;
+  color: #ff3b30;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+  &::before {
+    content: "⚠️";
+    margin-right: 10px;
+    font-size: 16px;
+  }
+}
