@@ -279,7 +279,7 @@ function CustomMarkdownContent({ content }: { content: string }) {
   );
 
   // 检查内容中是否包含特殊标签
-  const hasThinkTag = content.includes("<think>");
+  const hasThinkTag = content.includes("<thought>");
   const hasFunctionArgumentsTag = content.includes("<tools_arguments>");
   const hasSelfAnswerTag = content.includes("<self_answer>");
 
@@ -660,7 +660,7 @@ function splitContentByTags(
   let currentIndex = 0;
 
   // 正则表达式匹配所有完整的特殊标签
-  const tagRegex = /<(think|tools_arguments|self_answer)>([^]*?)<\/\1>/g;
+  const tagRegex = /<(thought|tools_arguments|self_answer)>([^]*?)<\/\1>/g;
   let match;
 
   // 处理所有完整的标签
@@ -690,7 +690,7 @@ function splitContentByTags(
     const remainingContent = content.substring(currentIndex);
 
     // 检查未闭合的标签
-    const incompleteThinkMatch = /<think>([^]*?)$/.exec(remainingContent);
+    const incompleteThinkMatch = /<thought>([^]*?)$/.exec(remainingContent);
     const incompleteFunctionMatch = /<tools_arguments>([^]*?)$/.exec(
       remainingContent,
     );
@@ -768,8 +768,8 @@ function _MarkDownContent(props: { content: string }) {
 
   // 检查内容中是否包含特殊标签或标签的开始部分
   const hasSpecialTags =
-    props.content.includes("<think>") ||
-    props.content.includes("</think>") ||
+    props.content.includes("<thought>") ||
+    props.content.includes("</thought>") ||
     props.content.includes("<tools_arguments>") ||
     props.content.includes("</tools_arguments>");
 

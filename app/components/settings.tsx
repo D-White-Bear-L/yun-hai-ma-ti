@@ -745,8 +745,8 @@ export function Settings() {
         <input
           aria-label={Locale.Settings.Access.OpenAI.Endpoint.Title}
           type="text"
-          // value={accessStore.openaiUrl}
-          value={OPENAI_BASE_URL}
+          value={accessStore.openaiUrl}
+          // value={OPENAI_BASE_URL}
           placeholder={OPENAI_BASE_URL}
           onChange={(e) =>
             accessStore.update(
