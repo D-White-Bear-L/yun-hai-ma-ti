@@ -796,30 +796,15 @@
   }
 }
 
-// 统一展开内容样式
-.function-content {
-  padding: 10px 16px;
-  overflow-x: auto;
-}
-
 // ================ Markdown 特殊标签样式 ================
-// 统一特殊标签的基础样式
-.think-tag,
-.function-arguments-tag {
-  margin: 10px 0;
-  border-radius: 8px;
-  overflow: hidden;
-  font-family: var(--font-family);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-// 统一标签头部样式
+// ***通用基础样式***
+// 函数头部样式
 .function-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
   cursor: pointer;
+  padding: 8px 16px;
   font-weight: 500;
   transition: background-color 0.3s;
   border-bottom: 1px dashed #ddd;
@@ -830,57 +815,112 @@
   }
 }
 
-// 统一状态标签样式
+// 状态标签样式
 .function-status {
   font-size: 12px;
   color: #888;
   padding: 4px 8px;
+  margin-left: 8px;
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  position: relative;
-  
-  &::after {
-    content: "";
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-style: solid;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg) translateY(-2px);
-    transition: transform 0.3s ease;
-    margin-left: 6px;
-  }
-  
-  &.expanded::after {
-    transform: rotate(-135deg) translateY(-2px);
-  }
   
   &:hover {
     color: var(--primary);
     background-color: rgba(255, 255, 255, 0.95);
-    
-    &::after {
-      border-color: var(--primary);
-    }
   }
 }
 
-// 统一折叠内容样式
+// 折叠内容样式
 .function-collapsed {
   color: #666;
   font-size: 14px;
-  font-style: italic;
+  font-style: italic; // 斜体
   padding: 10px 16px;
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(0, 0, 0, 0.02); 
+  display: flex;
+  align-items: center;
+  
+  // 添加图标容器样式
+  .icon-container {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  
+  // 旋转加载图标
+  .loading-icon {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(78, 137, 232, 0.2);
+    border-top: 2px solid #4e89e8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  
+  // 完成图标
+  .complete-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &::before {
+      content: '✓';
+      color: #4CAF50;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  }
+  
+  // 限定图标大小（前提是有）
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
-// 统一展开内容样式
+// 添加旋转动画
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.function-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
 .function-content {
-  padding: 10px 16px;
-  overflow-x: auto;
+  padding: 8px 16px;
+  overflow-x: auto; // 滚动条
+  background-color: rgba(156, 39, 176, 0.03);
+  // 代码块（not work）
+  .pre {
+    margin: 0;
+  }
+  // 代码块内容
+  .code {
+    font-size: 13px;
+  }
+}
+
+// ***特殊标签样式***
+.think-tag,
+.function-arguments-tag {
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: var(--font-family);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 // 思考过程标签样式
@@ -894,18 +934,13 @@
   }
   
   .function-name {
-    font-size: 14px;
-    font-weight: bold;
     color: #4e89e8;
   }
   
-  .function-collapsed {
-    padding-left:16px ;
-    background-color: rgba(78, 137, 232, 0.03);
-  }
-  
-  .function-content {
-    background-color: rgba(78, 137, 232, 0.03);
+  // 为思考过程添加特定的加载图标样式
+  .loading-icon {
+    border-color: rgba(78, 137, 232, 0.2);
+    border-top-color: #4e89e8;
   }
 }
 
@@ -920,68 +955,12 @@
   }
   
   .function-name {
-    font-size: 14px;
-    font-weight: bold;
     color: #9c27b0;
   }
   
-  .function-collapsed {
-    padding-left:16px ;
-    background-color: rgba(156, 39, 176, 0.03);
+  // 为函数调用添加特定的加载图标样式
+  .loading-icon {
+    border-color: rgba(156, 39, 176, 0.2);
+    border-top-color: #9c27b0;
   }
-  
-  .function-content {
-    background-color: rgba(156, 39, 176, 0.03);
-    
-    pre {
-      margin: 0;
-      background-color: rgba(0, 0, 0, 0.03);
-      border-radius: 4px;
-    }
-    
-    code {
-      font-family: var(--font-family-mono);
-      font-size: 13px;
-    }
-  }
-}
-
-// 函数头部样式
-.function-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed #ddd;
-  margin-bottom: 8px;
-}
-
-.function-name {
-  font-weight: bold;
-  color: #9b59b6;
-}
-
-.function-status {
-  font-size: 12px;
-  color: #888;
-  background-color: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #e0e0e0;
-  }
-}
-
-.function-collapsed {
-  color: #888;
-  font-style: italic;
-  padding: 4px 0;
-}
-
-.function-content {
-  padding-top: 8px;
-  overflow-x: auto;
 }

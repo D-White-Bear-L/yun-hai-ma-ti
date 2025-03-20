@@ -361,7 +361,20 @@ function CustomMarkdownContent({ content }: { content: string }) {
             </div>
 
             {!expandedThinks[index] ? (
-              <div className={styles["function-collapsed"]}>AI 的思考过程</div>
+              <div className={styles["function-collapsed"]}>
+                <div className={styles["icon-container"]}>
+                  {segment.content.includes("AI 正在思考中") ||
+                  segment.content.includes("思考中") ? (
+                    <div className={styles["loading-icon"]}></div>
+                  ) : (
+                    <div className={styles["complete-icon"]}></div>
+                  )}
+                </div>
+                {segment.content.includes("AI 正在思考中") ||
+                segment.content.includes("思考中")
+                  ? "AI 正在思考中..."
+                  : "AI 思考完成"}
+              </div>
             ) : (
               <div className={styles["function-content"]}>
                 <ReactMarkdown
@@ -446,7 +459,20 @@ function CustomMarkdownContent({ content }: { content: string }) {
             </div>
 
             {!expandedFunctions[index] ? (
-              <div className={styles["function-collapsed"]}>函数调用完成</div>
+              <div className={styles["function-collapsed"]}>
+                <div className={styles["icon-container"]}>
+                  {segment.content.includes("正在调用") ||
+                  segment.content.includes("调用中") ? (
+                    <div className={styles["loading-icon"]}></div>
+                  ) : (
+                    <div className={styles["complete-icon"]}></div>
+                  )}
+                </div>
+                {segment.content.includes("正在调用") ||
+                segment.content.includes("调用中")
+                  ? "函数调用中..."
+                  : "函数调用完成"}
+              </div>
             ) : (
               <div className={styles["function-content"]}>
                 <pre>
@@ -505,7 +531,7 @@ function CustomMarkdownContent({ content }: { content: string }) {
           </div>,
         );
       } else if (segment.type === "incomplete_think") {
-        // 未完成的思考标签，添加折叠功能
+        // 未完成的思考过程标签
         contentParts.push(
           <div
             key={`incomplete-think-${index}`}
@@ -525,121 +551,55 @@ function CustomMarkdownContent({ content }: { content: string }) {
                 {expandedThinks[index] ? "折叠" : "展开"}
               </span>
             </div>
-
             {!expandedThinks[index] ? (
               <div className={styles["function-collapsed"]}>
+                <div className={styles["icon-container"]}>
+                  <div className={styles["loading-icon"]}></div>
+                </div>
                 AI 正在思考中...
               </div>
             ) : (
               <div className={styles["function-content"]}>
-                <ReactMarkdown
-                  remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
-                  rehypePlugins={[
-                    RehypeKatex,
-                    [
-                      RehypeHighlight,
-                      {
-                        detect: false,
-                        ignoreMissing: true,
-                      },
-                    ],
-                  ]}
-                  components={{
-                    pre: PreCode,
-                    code: CustomCode,
-                    p: (pProps) => <p {...pProps} dir="auto" />,
-                    a: (aProps) => {
-                      const href = aProps.href || "";
-                      if (/\.(aac|mp3|opus|wav)$/.test(href)) {
-                        return (
-                          <figure>
-                            <audio controls src={href}></audio>
-                          </figure>
-                        );
-                      }
-                      if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
-                        return (
-                          <video controls width="99.9%">
-                            <source src={href} />
-                          </video>
-                        );
-                      }
-                      const isInternal = /^\/#/i.test(href);
-                      const target = isInternal
-                        ? "_self"
-                        : aProps.target ?? "_blank";
-                      return <a {...aProps} target={target} />;
-                    },
-                  }}
-                >
-                  {segment.content}
-                </ReactMarkdown>
+                <ReactMarkdown>{segment.content}</ReactMarkdown>
               </div>
             )}
           </div>,
         );
       } else if (segment.type === "incomplete_function") {
-        // 未完成的函数参数标签
+        // 未完成的函数调用标签
         contentParts.push(
           <div
             key={`incomplete-function-${index}`}
             className={`special-tag ${styles["function-arguments-tag"]}`}
           >
-            <div className={styles["function-header"]}>
-              <span className={styles["function-name"]}>函数调用</span>
-              <span className={styles["function-status"]}>生成中...</span>
-            </div>
-            <div className={styles["function-collapsed"]}>
-              函数调用生成中...
-            </div>
-          </div>,
-        );
-      } else if (segment.type === "incomplete_self_answer") {
-        // 未完成的自答标签，使用 ReactMarkdown 渲染内容
-        contentParts.push(
-          <div key={`incomplete-self-answer-${index}`}>
-            <ReactMarkdown
-              remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
-              rehypePlugins={[
-                RehypeKatex,
-                [
-                  RehypeHighlight,
-                  {
-                    detect: false,
-                    ignoreMissing: true,
-                  },
-                ],
-              ]}
-              components={{
-                pre: PreCode,
-                code: CustomCode,
-                p: (pProps) => <p {...pProps} dir="auto" />,
-                a: (aProps) => {
-                  const href = aProps.href || "";
-                  if (/\.(aac|mp3|opus|wav)$/.test(href)) {
-                    return (
-                      <figure>
-                        <audio controls src={href}></audio>
-                      </figure>
-                    );
-                  }
-                  if (/\.(3gp|3g2|webm|ogv|mpeg|mp4|avi)$/.test(href)) {
-                    return (
-                      <video controls width="99.9%">
-                        <source src={href} />
-                      </video>
-                    );
-                  }
-                  const isInternal = /^\/#/i.test(href);
-                  const target = isInternal
-                    ? "_self"
-                    : aProps.target ?? "_blank";
-                  return <a {...aProps} target={target} />;
-                },
+            <div
+              className={styles["function-header"]}
+              onClick={() => {
+                setExpandedFunctions((prev) => ({
+                  ...prev,
+                  [index]: !prev[index],
+                }));
               }}
             >
-              {segment.content}
-            </ReactMarkdown>
+              <span className={styles["function-name"]}>函数调用</span>
+              <span className={styles["function-status"]}>
+                {expandedFunctions[index] ? "折叠" : "展开"}
+              </span>
+            </div>
+            {!expandedFunctions[index] ? (
+              <div className={styles["function-collapsed"]}>
+                <div className={styles["icon-container"]}>
+                  <div className={styles["loading-icon"]}></div>
+                </div>
+                函数调用中...
+              </div>
+            ) : (
+              <div className={styles["function-content"]}>
+                <pre>
+                  <code>{segment.content}</code>
+                </pre>
+              </div>
+            )}
           </div>,
         );
       }
