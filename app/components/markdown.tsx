@@ -355,11 +355,9 @@ function CustomMarkdownContent({ content }: { content: string }) {
               }}
             >
               <span className={styles["function-name"]}>思考过程</span>
-              <span
-                className={`${styles["function-status"]} ${
-                  expandedThinks[index] ? styles["expanded"] : ""
-                }`}
-              />
+              <span className={styles["function-status"]}>
+                {expandedThinks[index] ? "折叠" : "展开"}
+              </span>
             </div>
 
             {!expandedThinks[index] ? (
@@ -442,11 +440,9 @@ function CustomMarkdownContent({ content }: { content: string }) {
               }}
             >
               <span className={styles["function-name"]}>{functionName}</span>
-              <span
-                className={`${styles["function-status"]} ${
-                  expandedFunctions[index] ? styles["expanded"] : ""
-                }`}
-              />
+              <span className={styles["function-status"]}>
+                {expandedFunctions[index] ? "折叠" : "展开"}
+              </span>
             </div>
 
             {!expandedFunctions[index] ? (
@@ -525,12 +521,8 @@ function CustomMarkdownContent({ content }: { content: string }) {
               }}
             >
               <span className={styles["function-name"]}>思考过程</span>
-              <span
-                className={`${styles["function-status"]} ${
-                  expandedThinks[index] ? styles["expanded"] : ""
-                }`}
-              >
-                展开
+              <span className={styles["function-status"]}>
+                {expandedThinks[index] ? "折叠" : "展开"}
               </span>
             </div>
 

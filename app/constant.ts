@@ -1,6 +1,8 @@
 export const OWNER = "ChatGPTNextWeb";
 export const REPO = "ChatGPT-Next-Web";
-export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
+export const YUN_OWNER = "D-White-Bear-L";
+export const YUN_REPO = "yun-hai-ma-ti";
+export const REPO_URL = `https://github.com/${YUN_OWNER}/${YUN_REPO}`;
 export const PLUGINS_REPO_URL = `https://github.com/${OWNER}/NextChat-Awesome-Plugins`;
 export const ISSUE_URL = `https://github.com/${OWNER}/${REPO}/issues`;
 export const UPDATE_URL = `${REPO_URL}#keep-updated`;
@@ -501,10 +503,10 @@ const openaiModels = [
   // "o3-mini",
 
   // owner
-  "openai/gpt-4.5-PreviewActions",
-  "openai/gpt-4o-mini",
-  // "openai/gpt-4o-mini-2024-07-18",
-  "openai/gpt-4o",
+  // "openai/gpt-4.5-PreviewActions",
+  // "openai/gpt-4o-mini",
+  // // "openai/gpt-4o-mini-2024-07-18",
+  // "openai/gpt-4o",
   "anthropic/claude-3.7-sonnet",
   "anthropic/claude-3.5-sonnet",
   "google/gemini-2.0-flash-001",

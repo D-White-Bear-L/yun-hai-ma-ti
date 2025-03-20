@@ -13,9 +13,6 @@ import { LoadingOutlined } from "@ant-design/icons"; // 加载图标
 import { Image, Card, Space, Result } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
 import { useState, useEffect } from "react"; // React Hooks
 
-// 删除 mock 数据相关代码
-// declare const require...
-
 // 定义图片和文件的接口
 interface ImageItem {
   id: string; // 图片id
@@ -38,6 +35,16 @@ interface ImageGalleryProps {
   images: ImageItem[];
   loading: boolean;
 }
+
+// 修改基础URL
+const BaseUrl = "http://47.108.162.246:8082/api";
+const apiUrl = {
+  images: "/v1/snapshot",
+  files: "/v1/files/others",
+};
+
+// 添加默认请求数量
+const DEFAULT_LIMIT = 10;
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, loading }) => {
   if (loading) {
@@ -114,7 +121,7 @@ const OtherFile: React.FC<OtherFileProps> = ({ files, loading }) => {
 
 // 文件管理
 export function FileManage() {
-  const navigate = useNavigate(); // 路由：用于返回
+  const navigate = useNavigate();
   const [images, setImages] = useState<ImageItem[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loadingImages, setLoadingImages] = useState(true);
@@ -126,7 +133,15 @@ export function FileManage() {
     const fetchImages = async () => {
       try {
         setLoadingImages(true);
-        const response = await fetch("/api/files/images");
+        // 添加limit参数到URL
+        const url = `${BaseUrl}${apiUrl.images}?limit=${DEFAULT_LIMIT}`;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           throw new Error("获取图片数据失败");
         }
@@ -143,12 +158,20 @@ export function FileManage() {
     fetchImages();
   }, []);
 
-  // 获取其他文件数据
+  // 获取文件数据
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         setLoadingFiles(true);
-        const response = await fetch("/api/files/others");
+        // 添加limit参数到URL
+        const url = `${BaseUrl}${apiUrl.files}?limit=${DEFAULT_LIMIT}`;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           throw new Error("获取文件数据失败");
         }
