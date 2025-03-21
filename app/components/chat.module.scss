@@ -783,19 +783,6 @@
   }
 }
 
-// 修改折叠内容样式
-.function-collapsed {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  color: var(--black);
-  
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
 // ================ Markdown 特殊标签样式 ================
 // ***通用基础样式***
 // 函数头部样式
@@ -906,10 +893,12 @@
   // 代码块（not work）
   .pre {
     margin: 0;
+    overflow-x: auto;
   }
   // 代码块内容
   .code {
     font-size: 13px;
+    overflow-x: auto;
   }
 }
 
