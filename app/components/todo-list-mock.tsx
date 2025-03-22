@@ -10,182 +10,134 @@ import { useState, useEffect } from "react";
 // 如果有删除图标
 
 // 定义待办事项类型
-
-// todo
-// 修改接口定义以匹配后端
 interface TodoItem {
-  id: string;
-  task: string;
+  id: number; // Date.now()
+  text: string;
   completed: boolean;
-  start_time: string;
-  end_time: string;
+  dueDate: string; // 截止日期字段
 }
 
-// 添加API基础URL和端点
-const BaseUrl = "http://127.0.0.1:8000/api";
-const apiUrl = {
-  todos: "/v1/todolist",
-};
-
+// todo
 export function TodoList() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 路由：用于返回
+
+  // 添加待办事项状态管理
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [newTodo, setNewTodo] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState("");
 
-  // 获取待办事项数据
+  // 1. 首先从localStorage加载数据，只在组件挂载时执行一次
   useEffect(() => {
-    const fetchTodos = async () => {
+    const savedTodos = localStorage.getItem("todos");
+    if (savedTodos && savedTodos !== "[]") {
       try {
-        setLoading(true);
-        const response = await fetch(`${BaseUrl}${apiUrl.todos}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-            // 添加跨域相关头部
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-          },
-          mode: "cors",
+        const parsedTodos = JSON.parse(savedTodos);
+        setTodos(parsedTodos);
+      } catch (error) {
+        console.error("解析待办事项出错:", error);
+      }
+    }
+  }, []); // 空依赖数组确保只执行一次
+
+  // 2. 当todos变化时保存到localStorage
+  useEffect(() => {
+    // 跳过组件初始挂载时的保存操作
+    if (todos.length > 0 || localStorage.getItem("todos") === "[]") {
+      // console.log("保存到localStorage:", todos);
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+  }, [todos]);
+
+  // 3. 检查过期待办
+  useEffect(() => {
+    const checkExpiredTodos = () => {
+      const currentTime = new Date().getTime();
+
+      setTodos((prevTodos) => {
+        // 找出未过期的待办事项
+        const validTodos = prevTodos.filter((todo) => {
+          if (!todo.dueDate) return true; // 没有设置截止日期的保留
+          const dueTime = new Date(todo.dueDate).getTime();
+          return dueTime > currentTime; // 只保留未过期的待办
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // 如果有待办事项被过滤掉，则返回新数组
+        if (validTodos.length !== prevTodos.length) {
+          console.log(
+            `已删除 ${prevTodos.length - validTodos.length} 个过期待办事项`,
+          );
+          return validTodos;
         }
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setTodos(data);
-        } else {
-          throw new Error("返回数据格式错误");
-        }
-      } catch (err: any) {
-        console.error("获取待办事项失败:", err);
-        setError(err instanceof Error ? err.message : "未知错误");
-      } finally {
-        setLoading(false);
-      }
+
+        // 否则保持不变
+        return prevTodos;
+      });
     };
 
-    fetchTodos();
-  }, []);
-  // toggleTodo 函数
-  const toggleTodo = async (id: string) => {
-    try {
-      // 找到当前待办事项
-      const todoToToggle = todos.find((todo) => todo.id === id);
-      if (!todoToToggle) return;
+    // 一旦页面加载就检查一次
+    checkExpiredTodos();
 
-      // 创建更新后的待办事项对象
-      const updatedTodo = {
-        ...todoToToggle,
-        completed: !todoToToggle.completed,
-      };
+    // // 设置分钟检查一次（这里是组件启动后开始计时轮巡）
+    // const intervalId = setInterval(checkExpiredTodos, 60 * 1000);
 
-      // 发送更新请求
-      const response = await fetch(`${BaseUrl}${apiUrl.todos}/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify(updatedTodo),
-      });
-
-      if (!response.ok) {
-        throw new Error("更新待办事项状态失败");
-      }
-
-      // 更新本地状态
-      setTodos(
-        todos.map((todo) =>
-          todo.id === id ? { ...todo, completed: !todo.completed } : todo,
-        ),
-      );
-    } catch (err: any) {
-      console.error("更新待办事项状态失败:", err);
-      setError(err instanceof Error ? err.message : "未知错误");
-    }
-  };
+    // // 组件卸载时清除定时器
+    // return () => clearInterval(intervalId);
+  }, []); // 只在组件挂载时设置一次定时器
 
   // 添加新待办事项
-  const addTodo = async () => {
+  const addTodo = () => {
     if (newTodo.trim() === "") return;
 
-    try {
-      const response = await fetch(`${BaseUrl}${apiUrl.todos}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify({
-          id: crypto.randomUUID(), // 添加 id 字段
-          task: newTodo,
-          completed: false, // 添加 completed 字段
-          start_time: new Date().toISOString(),
-          end_time: endTime || new Date().toISOString(), // 确保 end_time 有值
-        }),
-      });
+    const newTodoItem: TodoItem = {
+      id: Date.now(),
+      text: newTodo,
+      completed: false,
+      dueDate: dueDate, // 设置截止日期
+    };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        console.error("服务器响应:", errorData);
-        throw new Error(`添加待办事项失败: ${response.status}`);
-      }
+    setTodos([...todos, newTodoItem]);
+    setNewTodo("");
+    setDueDate("");
+  };
 
-      const newTodoItem = await response.json();
-      setTodos([...todos, newTodoItem]);
-      setNewTodo("");
-      setEndTime("");
-    } catch (err: any) {
-      console.error("添加待办事项失败:", err);
-      setError(err instanceof Error ? err.message : "未知错误");
-    }
+  // 切换待办事项状态
+  const toggleTodo = (id: number) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
   };
 
   // 删除待办事项
-  const deleteTodo = async (id: string) => {
-    try {
-      const response = await fetch(`${BaseUrl}${apiUrl.todos}/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        mode: "cors",
-      });
-
-      if (!response.ok) {
-        throw new Error("删除待办事项失败");
-      }
-
-      setTodos(todos.filter((todo) => todo.id !== id));
-    } catch (err: any) {
-      console.error("删除待办事项失败:", err);
-      setError(err instanceof Error ? err.message : "未知错误");
-    }
+  const deleteTodo = (id: number) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  // 修改日期格式化函数
-  const formatend_time = (dateString: string) => {
+  // 改进日期格式化函数
+  const formatDueDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return "";
 
-      const dateFormatted = date.toLocaleDateString("zh-CN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-      const timeFormatted = date.toLocaleTimeString("zh-CN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      // 日期格式化
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      // 时间格式化
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+
+      // 上午/下午显示
+      const ampm = hours >= 12 ? "下午" : "上午";
+      const displayHours = hours % 12 || 12;
+
+      // 分别返回日期和时间，可以在样式中分行显示
+      const dateFormatted = `${year}年${month}月${day}日`;
+      const timeFormatted = `${ampm}${displayHours}:${
+        minutes < 10 ? "0" + minutes : minutes
+      }`;
 
       return (
         <>
@@ -200,9 +152,9 @@ export function TodoList() {
 
   // 按截止日期对待办事项进行排序
   const sortedTodos = [...todos].sort((a, b) => {
-    if (!a.end_time) return 1; // 没有日期的放后面
-    if (!b.end_time) return -1;
-    return new Date(a.end_time).getTime() - new Date(b.end_time).getTime();
+    if (!a.dueDate) return 1; // 没有日期的放后面
+    if (!b.dueDate) return -1;
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   });
 
   return (
@@ -249,8 +201,8 @@ export function TodoList() {
                 <div className={styles["input-row"]}>
                   <input
                     type="datetime-local"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
                     className={styles["todo-date-input"]}
                   />
                 </div>
@@ -318,7 +270,7 @@ export function TodoList() {
                             todo.completed ? styles["completed"] : ""
                           }`}
                         >
-                          {todo.task}
+                          {todo.text}
                         </span>
                       </div>
 
@@ -326,13 +278,13 @@ export function TodoList() {
                         className={styles["todo-date"]}
                         style={{
                           color:
-                            new Date(todo.end_time).getTime() - Date.now() <=
+                            new Date(todo.dueDate).getTime() - Date.now() <=
                             5 * 60 * 1000
                               ? "red"
                               : "inherit",
                         }}
                       >
-                        {todo.end_time ? formatend_time(todo.end_time) : ""}
+                        {todo.dueDate ? formatDueDate(todo.dueDate) : ""}
                       </div>
 
                       <div className={styles["todo-action-wrapper"]}>

@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom"; // 路由
 import fileStyles from "./file-manage.module.scss"; // 样式
 // 3、第三方组件
 import { LoadingOutlined } from "@ant-design/icons"; // 加载图标
-import { Image, Card, Space, Result } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
+import { Image, Card, Space, Result, Spin, Typography } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
 import { useState, useEffect } from "react"; // React Hooks
 
 // 定义图片和文件的接口
@@ -18,16 +18,8 @@ interface ImageItem {
   id: string; // 图片id
   url: string; // 图片地址
   name: string; // 图片名称
-  createTime: string; // 创建时间
-}
-
-interface FileItem {
-  id: string;
-  name: string;
-  size: string;
-  type: string;
-  url: string;
-  createTime: string;
+  create_time: string; // 创建时间
+  score: number; // 得分
 }
 
 // 图片展示接口
@@ -37,21 +29,35 @@ interface ImageGalleryProps {
 }
 
 // 修改基础URL
-const BaseUrl = "http://47.108.162.246:8082/api";
+const BaseUrl = "http://127.0.0.1:8000/api";
 const apiUrl = {
   images: "/v1/snapshot",
-  files: "/v1/files/others",
 };
 
 // 添加默认请求数量
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 20;
 
+// 引入更多图标和动画组件
+import { CameraOutlined, HeartOutlined } from "@ant-design/icons";
+import { Badge } from "antd";
+
+// 修改 ImageGallery 组件的加载状态显示
+const { Text } = Typography;
+
+// 在 ImageGallery 组件中修改图片展示部分
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, loading }) => {
   if (loading) {
     return (
       <div className={fileStyles.loadingContainer}>
-        <LoadingOutlined style={{ fontSize: 24 }} />
-        <p>加载中...</p>
+        <Spin
+          size="large"
+          tip="正在唤醒记忆中..."
+          style={{
+            margin: "40px auto",
+            width: "100%",
+            textAlign: "center",
+          }}
+        />
       </div>
     );
   }
@@ -61,71 +67,78 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, loading }) => {
       <div className={fileStyles.ImageGallery}>
         {images.map((image) => (
           <div key={image.id} className={fileStyles.ImageWrapper}>
-            <Image
-              src={image.url}
-              alt={image.name}
-              className={fileStyles.Image}
-              preview={{
-                src: image.url,
-                scaleStep: 0.3,
-              }}
-              placeholder={
-                <div className={fileStyles.ImagePlaceholder}>
-                  <LoadingOutlined />
+            <Badge.Ribbon
+              text={`${image.score.toFixed(1)}分`}
+              color={image.score > 7 ? "#f50" : "#108ee9"}
+              className={fileStyles.ScoreBadge}
+            >
+              <div className={fileStyles.MemoryCard}>
+                <Image
+                  src={image.url}
+                  alt={image.name}
+                  className={fileStyles.Image}
+                  preview={{
+                    src: image.url,
+                    scaleStep: 0.3,
+                    mask: (
+                      <div className={fileStyles.PreviewMask}>
+                        <CameraOutlined /> 查看记忆
+                      </div>
+                    ),
+                  }}
+                  placeholder={
+                    <div className={fileStyles.ImagePlaceholder}>
+                      <LoadingOutlined />
+                    </div>
+                  }
+                />
+                <div className={fileStyles.MemoryInfo}>
+                  <Text className={fileStyles.MemoryDate}>
+                    <span className={fileStyles.MemoryIcon}>📅</span> 记忆于:{" "}
+                    {formatCreateTime(image.create_time)}
+                  </Text>
+                  <Text className={fileStyles.MemoryScore}>
+                    <HeartOutlined className={fileStyles.HeartIcon} /> 美观程度:{" "}
+                    {image.score.toFixed(1)}
+                  </Text>
                 </div>
-              }
-            />
+              </div>
+            </Badge.Ribbon>
           </div>
         ))}
       </div>
     );
   } else {
-    return <Result status="404" subTitle="暂无精彩图像记忆诶~" />;
+    return <Result status="404" subTitle="暂无精彩图像记忆，去记录一些吧！" />;
   }
 };
 
-interface OtherFileProps {
-  files: FileItem[];
-  loading: boolean;
-}
-
-const OtherFile: React.FC<OtherFileProps> = ({ files, loading }) => {
-  if (loading) {
-    return (
-      <div className={fileStyles.loadingContainer}>
-        <LoadingOutlined style={{ fontSize: 24 }} />
-        <p>加载中...</p>
-      </div>
-    );
+// 添加时间格式化函数
+const formatCreateTime = (timeString: string) => {
+  try {
+    const date = new Date(timeString);
+    // 检查是否是有效日期
+    if (isNaN(date.getTime())) {
+      return "时间未知";
+    }
+    return date.toLocaleDateString("zh-CN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    console.error("时间格式化错误:", error);
+    return "时间未知";
   }
-
-  if (files.length) {
-    return (
-      <div className={fileStyles.OtherFile}>
-        {files.map((file) => (
-          <div key={file.id} className={fileStyles.FileItem}>
-            <div className={fileStyles.FileName}>{file.name}</div>
-            <div className={fileStyles.FileSize}>{file.size}</div>
-            <div className={fileStyles.FileType}>{file.type}</div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return (
-    <div>
-      <Result status="404" subTitle="暂无其他文件记忆诶~" />
-    </div>
-  );
 };
 
 // 文件管理
 export function FileManage() {
   const navigate = useNavigate();
   const [images, setImages] = useState<ImageItem[]>([]);
-  const [files, setFiles] = useState<FileItem[]>([]);
   const [loadingImages, setLoadingImages] = useState(true);
-  const [loadingFiles, setLoadingFiles] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // 获取图片数据
@@ -133,7 +146,6 @@ export function FileManage() {
     const fetchImages = async () => {
       try {
         setLoadingImages(true);
-        // 添加limit参数到URL
         const url = `${BaseUrl}${apiUrl.images}?limit=${DEFAULT_LIMIT}`;
         const response = await fetch(url, {
           method: "GET",
@@ -141,51 +153,38 @@ export function FileManage() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
+          mode: "cors",
         });
+
         if (!response.ok) {
-          throw new Error("获取图片数据失败");
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setImages(data);
-      } catch (err) {
+        if (Array.isArray(data)) {
+          // 检查并处理图片URL
+          const processedData = data.map((item) => ({
+            ...item,
+            url: item.url.startsWith("http")
+              ? item.url
+              : `${BaseUrl}${item.url}`,
+          }));
+          setImages(processedData);
+          console.log("获取数据成功", processedData);
+        } else {
+          throw new Error("返回数据格式错误");
+        }
+      } catch (err: any) {
         console.error("获取图片数据出错:", err);
-        setError("获取图片数据失败，请稍后重试");
+        setError(
+          "获取图片数据出错：" +
+            (err instanceof Error ? err.message : "未知错误"),
+        );
       } finally {
         setLoadingImages(false);
       }
     };
 
     fetchImages();
-  }, []);
-
-  // 获取文件数据
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        setLoadingFiles(true);
-        // 添加limit参数到URL
-        const url = `${BaseUrl}${apiUrl.files}?limit=${DEFAULT_LIMIT}`;
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error("获取文件数据失败");
-        }
-        const data = await response.json();
-        setFiles(data);
-      } catch (err) {
-        console.error("获取文件数据出错:", err);
-        setError("获取文件数据失败，请稍后重试");
-      } finally {
-        setLoadingFiles(false);
-      }
-    };
-
-    fetchFiles();
   }, []);
 
   return (
@@ -201,7 +200,7 @@ export function FileManage() {
             </div>
             {/* 副标题 */}
             <div className="window-header-submai-title">
-              {Locale.FileManage.Page.SubTitle(images.length + files.length)}
+              {Locale.FileManage.Page.SubTitle(images.length)}
             </div>
           </div>
           {/* 窗口操作按钮 */}
@@ -226,9 +225,6 @@ export function FileManage() {
               <div className="Image">
                 <ImageGallery images={images} loading={loadingImages} />
               </div>
-            </Card>
-            <Card title="其他记忆" size="small">
-              <OtherFile files={files} loading={loadingFiles} />
             </Card>
           </Space>
         </div>

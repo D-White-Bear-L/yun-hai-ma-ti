@@ -85,7 +85,7 @@ const McpMarketPage = dynamic(
 
 // file-manage
 const FileManage = dynamic(
-  async () => (await import("./file-manage-mock")).FileManage,
+  async () => (await import("./file-manage")).FileManage,
   {
     loading: () => <Loading noLogo />,
   },
