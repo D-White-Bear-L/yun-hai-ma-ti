@@ -6,7 +6,7 @@ import { IconButton } from "./button"; // 按钮
 import CloseIcon from "../icons/close.svg"; // 关闭图标
 import { useNavigate } from "react-router-dom"; // 路由
 import { useState, useEffect } from "react";
-import { OPENAI_BASE_URL } from "../constant";
+import { BASE_URL } from "../constant";
 
 // 定义待办事项类型
 
@@ -22,7 +22,7 @@ interface TodoItem {
 
 // 添加API基础URL和端点
 // const BaseUrl = "http://127.0.0.1:8000/api";
-const BaseUrl = OPENAI_BASE_URL;
+const BaseUrl = BASE_URL;
 
 // 添加默认请求数量
 const DEFAULT_LIMIT = 10;

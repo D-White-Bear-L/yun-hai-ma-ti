@@ -13,7 +13,7 @@ import { LoadingOutlined } from "@ant-design/icons"; // 加载图标
 import { Image, Card, Space, Result, Spin, Typography } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
 import { useState, useEffect } from "react"; // React Hooks
 // BaseUrl
-import { OPENAI_BASE_URL } from "../constant";
+import { BASE_URL } from "../constant";
 
 // 定义图片和文件的接口
 interface ImageItem {
@@ -32,7 +32,7 @@ interface ImageGalleryProps {
 
 // 修改基础URL
 // const BaseUrl = "http://127.0.0.1:8000/api"; //test
-const BaseUrl = OPENAI_BASE_URL;
+const BaseUrl = BASE_URL;
 
 const apiUrl = {
   images: "/v1/snapshot",
