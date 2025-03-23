@@ -336,9 +336,12 @@
   padding-left: 0.25rem; /* 微调左内边距 */
 }
 
-.completed {
-  text-decoration: line-through;
-  color: var(--black-50);
+.todo-text {
+  &.completed {
+    text-decoration: line-through;
+    color: #888;
+    opacity: 0.8;
+  }
 }
 
 .todo-date {

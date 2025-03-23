@@ -6,8 +6,7 @@ import { IconButton } from "./button"; // 按钮
 import CloseIcon from "../icons/close.svg"; // 关闭图标
 import { useNavigate } from "react-router-dom"; // 路由
 import { useState, useEffect } from "react";
-// 如果有添加图标
-// 如果有删除图标
+import { OPENAI_BASE_URL } from "../constant";
 
 // 定义待办事项类型
 
@@ -22,10 +21,18 @@ interface TodoItem {
 }
 
 // 添加API基础URL和端点
-const BaseUrl = "http://127.0.0.1:8000/api";
+// const BaseUrl = "http://127.0.0.1:8000/api";
+const BaseUrl = OPENAI_BASE_URL;
+
+// 添加默认请求数量
+const DEFAULT_LIMIT = 10;
+
 const apiUrl = {
   todos: "/v1/todolist",
 };
+
+// 添加本地存储键名常量
+const COMPLETED_TODOS_KEY = "completed_todos";
 
 export function TodoList() {
   const navigate = useNavigate();
@@ -34,24 +41,29 @@ export function TodoList() {
   const [endTime, setEndTime] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [completedTodos, setCompletedTodos] = useState<Set<string>>(new Set());
 
   // 获取待办事项数据
   useEffect(() => {
+    const savedCompletedTodos = localStorage.getItem(COMPLETED_TODOS_KEY);
+    if (savedCompletedTodos) {
+      setCompletedTodos(new Set(JSON.parse(savedCompletedTodos)));
+    }
     const fetchTodos = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${BaseUrl}${apiUrl.todos}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-            // 添加跨域相关头部
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        const response = await fetch(
+          `${BaseUrl}${apiUrl.todos}?n=${DEFAULT_LIMIT}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+            mode: "cors",
+            // 移除 credentials: "include"
           },
-          mode: "cors",
-        });
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -73,39 +85,60 @@ export function TodoList() {
     fetchTodos();
   }, []);
   // toggleTodo 函数
+  // const toggleTodo = async (id: string) => {
+  //   try {
+  //     // 找到当前待办事项
+  //     const todoToToggle = todos.find((todo) => todo.id === id);
+  //     if (!todoToToggle) return;
+
+  //     // 创建更新后的待办事项对象
+  //     const updatedTodo = {
+  //       ...todoToToggle,
+  //       completed: !todoToToggle.completed,
+  //     };
+
+  //     // 发送更新请求
+  //     const response = await fetch(`${BaseUrl}${apiUrl.todos}/${id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //       mode: "cors",
+  //       body: JSON.stringify(updatedTodo),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("更新待办事项状态失败");
+  //     }
+
+  //     // 更新本地状态
+  //     setTodos(
+  //       todos.map((todo) =>
+  //         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+  //       ),
+  //     );
+  //   } catch (err: any) {
+  //     console.error("更新待办事项状态失败:", err);
+  //     setError(err instanceof Error ? err.message : "未知错误");
+  //   }
+  // };
+  // toggleTodo 函数
   const toggleTodo = async (id: string) => {
     try {
-      // 找到当前待办事项
-      const todoToToggle = todos.find((todo) => todo.id === id);
-      if (!todoToToggle) return;
-
-      // 创建更新后的待办事项对象
-      const updatedTodo = {
-        ...todoToToggle,
-        completed: !todoToToggle.completed,
-      };
-
-      // 发送更新请求
-      const response = await fetch(`${BaseUrl}${apiUrl.todos}/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify(updatedTodo),
-      });
-
-      if (!response.ok) {
-        throw new Error("更新待办事项状态失败");
+      const newCompletedTodos = new Set(completedTodos);
+      if (completedTodos.has(id)) {
+        newCompletedTodos.delete(id);
+      } else {
+        newCompletedTodos.add(id);
       }
 
-      // 更新本地状态
-      setTodos(
-        todos.map((todo) =>
-          todo.id === id ? { ...todo, completed: !todo.completed } : todo,
-        ),
+      // 更新本地存储
+      localStorage.setItem(
+        COMPLETED_TODOS_KEY,
+        JSON.stringify([...newCompletedTodos]),
       );
+      setCompletedTodos(newCompletedTodos);
     } catch (err: any) {
       console.error("更新待办事项状态失败:", err);
       setError(err instanceof Error ? err.message : "未知错误");
@@ -117,6 +150,10 @@ export function TodoList() {
     if (newTodo.trim() === "") return;
 
     try {
+      const startTime = new Date();
+      let defaultEndTime = new Date(startTime);
+      defaultEndTime.setDate(defaultEndTime.getDate() + 1);
+
       const response = await fetch(`${BaseUrl}${apiUrl.todos}`, {
         method: "POST",
         headers: {
@@ -129,7 +166,7 @@ export function TodoList() {
           task: newTodo,
           completed: false, // 添加 completed 字段
           start_time: new Date().toISOString(),
-          end_time: endTime || new Date().toISOString(), // 确保 end_time 有值
+          end_time: endTime || defaultEndTime.toISOString(), // 确保 end_time 有值
         }),
       });
 
@@ -171,10 +208,22 @@ export function TodoList() {
     }
   };
 
-  // 修改日期格式化函数
-  const formatend_time = (dateString: string) => {
+  // 修改日期格式化函数，添加默认截止时间处理
+  const formatDateTime = (
+    dateString: string,
+    isEndTime = false,
+    startTime?: string,
+  ) => {
     try {
-      const date = new Date(dateString);
+      let date = new Date(dateString);
+
+      // 如果是截止时间且为空，则使用开始时间加一天
+      if (isEndTime && !dateString && startTime) {
+        date = new Date(startTime);
+        // 使用 setDate 会自动处理月份和年份的进位
+        date.setDate(date.getDate() + 1);
+      }
+
       if (isNaN(date.getTime())) return "";
 
       const dateFormatted = date.toLocaleDateString("zh-CN", {
@@ -231,7 +280,7 @@ export function TodoList() {
         <div className={styles["mask-page-body"]}>
           <div className={styles["todo-container"]}>
             {/* 待办事项输入区域 */}
-            <div className={styles["todo-input-wrapper"]}>
+            {/* <div className={styles["todo-input-wrapper"]}>
               <div className={styles["todo-input-container"]}>
                 <div className={styles["input-row"]}>
                   <input
@@ -267,14 +316,15 @@ export function TodoList() {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* 待办事项列表 */}
             <div className={styles["todo-list-section"]}>
               <div className={styles["todo-list-header"]}>
                 <div className={styles["task-column"]}>任务</div>
+                <div className={styles["time-column"]}>开始时间</div>
                 <div className={styles["time-column"]}>截止时间</div>
-                <div className={styles["action-column"]}>操作</div>
+                {/* <div className={styles["action-column"]}>操作</div> */}
               </div>
 
               {sortedTodos.length === 0 ? (
@@ -307,7 +357,7 @@ export function TodoList() {
                           <input
                             type="checkbox"
                             id={`todo-${todo.id}`}
-                            checked={todo.completed}
+                            checked={completedTodos.has(todo.id)}
                             onChange={() => toggleTodo(todo.id)}
                             className={styles["todo-checkbox"]}
                           />
@@ -315,27 +365,39 @@ export function TodoList() {
                         </div>
                         <span
                           className={`${styles["todo-text"]} ${
-                            todo.completed ? styles["completed"] : ""
+                            completedTodos.has(todo.id)
+                              ? styles["completed"]
+                              : ""
                           }`}
                         >
                           {todo.task}
                         </span>
                       </div>
 
+                      <div className={styles["todo-date"]}>
+                        {formatDateTime(todo.start_time, false)}
+                      </div>
+
                       <div
                         className={styles["todo-date"]}
                         style={{
                           color:
-                            new Date(todo.end_time).getTime() - Date.now() <=
+                            new Date(
+                              todo.end_time ||
+                                new Date(todo.start_time).setDate(
+                                  new Date(todo.start_time).getDate() + 1,
+                                ),
+                            ).getTime() -
+                              Date.now() <=
                             5 * 60 * 1000
                               ? "red"
                               : "inherit",
                         }}
                       >
-                        {todo.end_time ? formatend_time(todo.end_time) : ""}
+                        {formatDateTime(todo.end_time, true, todo.start_time)}
                       </div>
 
-                      <div className={styles["todo-action-wrapper"]}>
+                      {/* <div className={styles["todo-action-wrapper"]}>
                         <button
                           onClick={() => deleteTodo(todo.id)}
                           className={styles["todo-delete-button"]}
@@ -343,7 +405,7 @@ export function TodoList() {
                         >
                           ×
                         </button>
-                      </div>
+                      </div> */}
                     </li>
                   ))}
                 </ul>

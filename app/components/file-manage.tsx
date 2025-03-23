@@ -12,6 +12,8 @@ import fileStyles from "./file-manage.module.scss"; // 样式
 import { LoadingOutlined } from "@ant-design/icons"; // 加载图标
 import { Image, Card, Space, Result, Spin, Typography } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
 import { useState, useEffect } from "react"; // React Hooks
+// BaseUrl
+import { OPENAI_BASE_URL } from "../constant";
 
 // 定义图片和文件的接口
 interface ImageItem {
@@ -29,13 +31,15 @@ interface ImageGalleryProps {
 }
 
 // 修改基础URL
-const BaseUrl = "http://127.0.0.1:8000/api";
+// const BaseUrl = "http://127.0.0.1:8000/api"; //test
+const BaseUrl = OPENAI_BASE_URL;
+
 const apiUrl = {
   images: "/v1/snapshot",
 };
 
 // 添加默认请求数量
-const DEFAULT_LIMIT = 20;
+const DEFAULT_LIMIT = 15;
 
 // 引入更多图标和动画组件
 import { CameraOutlined, HeartOutlined } from "@ant-design/icons";
@@ -69,7 +73,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, loading }) => {
           <div key={image.id} className={fileStyles.ImageWrapper}>
             <Badge.Ribbon
               text={`${image.score.toFixed(1)}分`}
-              color={image.score > 7 ? "#f50" : "#108ee9"}
+              color={image.score > 5 ? "#f50" : "#108ee9"}
               className={fileStyles.ScoreBadge}
             >
               <div className={fileStyles.MemoryCard}>
@@ -78,13 +82,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, loading }) => {
                   alt={image.name}
                   className={fileStyles.Image}
                   preview={{
-                    src: image.url,
-                    scaleStep: 0.3,
                     mask: (
                       <div className={fileStyles.PreviewMask}>
                         <CameraOutlined /> 查看记忆
                       </div>
                     ),
+                    maskClassName: fileStyles.customPreviewMask,
+                    rootClassName: fileStyles.previewRoot,
                   }}
                   placeholder={
                     <div className={fileStyles.ImagePlaceholder}>
@@ -146,7 +150,7 @@ export function FileManage() {
     const fetchImages = async () => {
       try {
         setLoadingImages(true);
-        const url = `${BaseUrl}${apiUrl.images}?limit=${DEFAULT_LIMIT}`;
+        const url = `${BaseUrl}${apiUrl.images}?n=${DEFAULT_LIMIT}`;
         const response = await fetch(url, {
           method: "GET",
           headers: {
