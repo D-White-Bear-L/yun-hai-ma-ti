@@ -39,6 +39,8 @@ dev
 .vscode
 .idea
 
+
+
 # docker-compose env files
 .env
 
@@ -49,3 +51,27 @@ masks.json
 
 # mcp config
 app/mcp/mcp_config.json
+
+# package should be ignoring
+# mock files
+app/components/todo-list-mock.tsx
+app/components/file-manage-mock.tsx
+
+# docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# docs
+
+# test files
+test/
+jest.config.ts
+jest.setup.ts
+
+# development configs
+
+.github/
+
+# mock files
+public/mock/

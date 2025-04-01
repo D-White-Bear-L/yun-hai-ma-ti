@@ -2,7 +2,7 @@ export const OWNER = "ChatGPTNextWeb";
 export const REPO = "ChatGPT-Next-Web";
 export const YUN_OWNER = "D-White-Bear-L";
 export const YUN_REPO = "yun-hai-ma-ti";
-export const REPO_URL = `https://github.com/${YUN_OWNER}/${YUN_REPO}`;
+export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
 export const PLUGINS_REPO_URL = `https://github.com/${OWNER}/NextChat-Awesome-Plugins`;
 export const ISSUE_URL = `https://github.com/${OWNER}/${REPO}/issues`;
 export const UPDATE_URL = `${REPO_URL}#keep-updated`;
@@ -15,7 +15,7 @@ export const STABILITY_BASE_URL = "https://api.stability.ai";
 
 // export const OPENAI_BASE_URL = "https://api.openai.com";
 export const OPENAI_BASE_URL = "http://47.108.162.246:8082/api";
-export const BASE_URL = "https://47.108.162.246:8082/api";
+export const BASE_URL = "https://47.108.162.246:8083/api";
 
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 
