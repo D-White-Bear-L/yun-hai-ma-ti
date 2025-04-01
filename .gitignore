@@ -63,6 +63,7 @@ docker-compose.yml
 .dockerignore
 
 # docs
+CODE_OF_CONDUCT.md
 
 # test files
 test/
