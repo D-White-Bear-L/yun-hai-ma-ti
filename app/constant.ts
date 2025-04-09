@@ -15,6 +15,7 @@ export const STABILITY_BASE_URL = "https://api.stability.ai";
 
 // export const OPENAI_BASE_URL = "https://api.openai.com";
 export const OPENAI_BASE_URL = "http://47.108.162.246:8082/api";
+// export const BASE_URL = "https://www.ohippo.tech:8083/api";
 export const BASE_URL = "https://47.108.162.246:8083/api";
 
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
@@ -60,6 +61,7 @@ export enum Path {
   McpMarket = "/mcp-market",
   FileManage = "/cloud-memory-show",
   TodoList = "/todo-list",
+  SearchObject = "/search-object",
 }
 
 export enum ApiPath {

@@ -1,0 +1,433 @@
+// 页面容器
+.mask-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f7fa;
+  
+  // 添加窗口头部样式
+  .window-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    
+    .window-header-title {
+      display: flex;
+      flex-direction: column;
+      
+      .window-header-main-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--primary);
+      }
+      
+      .window-header-sub-title {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+      }
+    }
+    
+    .window-actions {
+      display: flex;
+      align-items: center;
+      
+      .window-action-button {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+.mask-page-body {
+  flex: 1;
+  overflow: auto;
+  padding: 2%;
+}
+
+// 搜索容器
+.search-container {
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2%;
+}
+
+// 输入区域样式
+.search-input-wrapper {
+  background-color: var(--second);
+  border-radius: 0.75rem;
+  padding: 1%;
+  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+}
+
+.search-input-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.input-row {
+  &:first-child {
+    flex: 1;
+  }
+  
+  &:not(:first-child) {
+    width: auto;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100% !important;
+    
+    &:not(:first-child) {
+      width: 100% !important;
+    }
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-in-light);
+    border-radius: 0.5rem;
+    transition: all 0.25s ease;
+    font-size: 1rem;
+    background: white;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 0.75rem 1rem;
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.125rem rgba(var(--primary-rgb), 0.1);
+    }
+    
+    &::placeholder {
+      color: #718096;
+    }
+
+  }
+
+  .search-button {
+    white-space: nowrap;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: white;
+    background-color: var(--primary);
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 0.75rem 1rem;
+    }
+    
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0.0625rem);
+    }
+    
+    &.button-disabled {
+      background-color: #cbd5e0;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// 搜索结果区域
+.search-result-section {
+  width: 100%;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  padding: 30px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    padding: 15px;
+    border-radius: 0.75rem;
+  }
+}
+
+// 图片展示样式 - 蛇形布局
+.ImageGallery {
+  position: relative;
+  padding: 30px 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    padding: 15px 0;
+  }
+}
+
+// 行容器
+.ImageRow {
+  display: flex;
+  margin-bottom: 80px;
+  position: relative;
+  
+  // 奇数行 - 从左到右
+  &:nth-child(odd) {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  
+  // 偶数行 - 从右到左
+  &:nth-child(even) {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+  }
+  
+  @media (max-width: 768px) {
+    margin-bottom: 30px;
+    
+    // 在移动端保持垂直布局，但保留蛇形连接线的视觉效果
+    &:nth-child(odd), &:nth-child(even) {
+      flex-direction: column !important;
+      align-items: center;
+    }
+  }
+}
+
+// 蛇形连接线
+.snakeConnector {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  
+  @media (max-width: 768px) {
+    display: block; // 在移动端显示蛇形连接线
+    height: calc(100% + 30px); // 增加高度以适应垂直布局
+  }
+}
+
+.connector {
+  position: absolute;
+  border: 2px solid;
+  opacity: 0.8;
+  
+  &.rightDown {
+    right: 0;
+    bottom: -40px;
+    width: 40px;
+    height: 80px;
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 20px;
+  }
+  
+  &.leftDown {
+    left: 0;
+    bottom: -40px;
+    width: 40px;
+    height: 80px;
+    border-right: none;
+    border-top: none;
+    border-bottom-left-radius: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    display: block; // 在移动端显示连接器
+    
+    &.rightDown, &.leftDown {
+      left: 50%;
+      right: auto;
+      bottom: -15px;
+      width: 2px;
+      height: 30px;
+      border: none;
+      border-radius: 0;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+// 图片项样式
+.ImageWrapper {
+  position: relative;
+  width: 30%;
+  margin: 0 1.5%;
+  transition: all 0.4s ease;
+  
+  &:hover {
+    transform: translateY(-8px);
+  }
+  
+  @media (max-width: 768px) {
+    width: 90%;
+    margin: 0 0 30px 0;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+  
+  // 同一行内的连接线和箭头
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    height: 2px;
+    z-index: 1;
+    opacity: 0.8;
+    
+    @media (max-width: 768px) {
+      left: 50%;
+      top: auto;
+      bottom: -15px;
+      width: 2px !important;
+      height: 15px;
+      transform: translateX(-50%);
+    }
+  }
+  
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    z-index: 2;
+    opacity: 0.8;
+    
+    @media (max-width: 768px) {
+      display: none; // 在移动端隐藏箭头
+    }
+  }
+}
+
+// 时间标签
+.ImageTime {
+  position: absolute;
+  top: -30px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  letter-spacing: 0.5px;
+  
+  @media (max-width: 768px) {
+    top: -25px;
+    font-size: 13px;
+  }
+}
+
+// 图片容器
+.ImageContent {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  position: relative;
+  
+  &:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    z-index: 2;
+  }
+  
+  @media (max-width: 768px) {
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.Image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: all 0.5s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  @media (max-width: 768px) {
+    height: 180px;
+  }
+}
+
+.ImageInfo {
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+  .ImagePlace {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    letter-spacing: 0.3px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 15px;
+    
+    .ImagePlace {
+      font-size: 14px;
+    }
+  }
+}
+
+// 加载和错误状态
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 40px 0;
+  color: #666;
+}
+
+.error-message {
+  color: #ff4d4f;
+  text-align: center;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+}

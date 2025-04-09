@@ -672,6 +672,14 @@ const cn = {
       SubTitle: (count: number) => `共 ${count} 项待办`,
     },
   },
+  SearchObject: {
+    Name: "记忆检索",
+    Page: {
+      Title: "记忆检索",
+      Search: "输入相关记忆关键词",
+      SubTitle: (count: number) => `共 ${count} 条记录`,
+    },
+  },
   SearchChat: {
     Name: "搜索聊天记录",
     Page: {

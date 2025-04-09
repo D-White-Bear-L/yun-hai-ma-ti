@@ -96,9 +96,17 @@ const TodoList = dynamic(async () => (await import("./todo-list")).TodoList, {
   loading: () => <Loading noLogo />,
 });
 
-const Login = dynamic(async () => (await import("./login")).Login, {
-  loading: () => <Loading noLogo />,
-});
+// search-object
+const SearchObject = dynamic(
+  async () => (await import("./search-object")).SearchObject,
+  {
+    loading: () => <Loading noLogo />,
+  },
+);
+
+// const Login = dynamic(async () => (await import("./login")).Login, {
+//   loading: () => <Loading noLogo />,
+// });
 
 export function useSwitchTheme() {
   const config = useAppConfig();
@@ -222,6 +230,7 @@ function Screen() {
             <Route path={Path.McpMarket} element={<McpMarketPage />} />
             <Route path={Path.FileManage} element={<FileManage />} />
             <Route path={Path.TodoList} element={<TodoList />} />
+            <Route path={Path.SearchObject} element={<SearchObject />} />
           </Routes>
         </WindowContent>
       </>
