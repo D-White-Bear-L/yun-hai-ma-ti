@@ -53,26 +53,26 @@ masks.json
 app/mcp/mcp_config.json
 
 # package should be ignoring
-# mock files
-app/components/todo-list-mock.tsx
-app/components/file-manage-mock.tsx
+# # mock files
+# app/components/todo-list-mock.tsx
+# app/components/file-manage-mock.tsx
 
-# docker files
-Dockerfile
-docker-compose.yml
-.dockerignore
+# # docker files
+# Dockerfile
+# docker-compose.yml
+# .dockerignore
 
-# docs
-CODE_OF_CONDUCT.md
+# # docs
+# CODE_OF_CONDUCT.md
 
-# test files
-test/
-jest.config.ts
-jest.setup.ts
+# # test files
+# test/
+# jest.config.ts
+# jest.setup.ts
 
-# development configs
+# # development configs
 
-.github/
+# .github/
 
-# mock files
-public/mock/
+# # mock files
+# public/mock/
