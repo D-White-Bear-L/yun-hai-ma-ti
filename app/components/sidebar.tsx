@@ -34,6 +34,7 @@ import { isMcpEnabled } from "../mcp/actions";
 
 const DISCOVERY = [
   { name: Locale.FileManage.Page.Title, path: Path.FileManage },
+  { name: Locale.SearchObject.Page.Title, path: Path.SearchObject },
   { name: Locale.TodoList.Page.Title, path: Path.TodoList },
   { name: Locale.SearchChat.Page.Title, path: Path.SearchChat },
   // { name: Locale.Plugin.Name, path: Path.Plugins },

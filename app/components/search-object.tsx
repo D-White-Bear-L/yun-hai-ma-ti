@@ -13,7 +13,7 @@ import searchStyle from "./search-object.module.scss";
 const BaseUrl = BASE_URL;
 
 const apiUrl = {
-  images: "/api/v1/search",
+  images: "/api/v1/osearch",
 };
 
 // 定义图片接口
@@ -22,7 +22,8 @@ interface ImageItem {
   url: string; // 图片路径
   name: string; // 图片名称
   place: string; // 物品地点
-  create_time: string; // 创建时间
+  create_time: string | number; // 创建时间
+  score?: number; // 相关性得分
 }
 
 // 图片展示接口
@@ -102,7 +103,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   }
 };
 
-// 将 searchObject 改为 SearchObject (首字母大写)
 export function SearchObject() {
   const navigate = useNavigate(); // 路由：用于返回
   const [Object, setObject] = useState("");
@@ -113,8 +113,9 @@ export function SearchObject() {
   const Search = async () => {
     try {
       setLoadingImages(true);
-      // 修正 URL 拼接，确保使用 encodeURIComponent 处理查询参数
-      const url = `${BaseUrl}${apiUrl.images}?object=${Object}`;
+      const url = `${BaseUrl}${apiUrl.images}?query=${encodeURIComponent(
+        Object,
+      )}`;
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -131,20 +132,22 @@ export function SearchObject() {
       if (Array.isArray(data)) {
         const processedData = data.map((item) => ({
           ...item,
+          // 确保 URL 处理正确
           url: item.url.startsWith("http") ? item.url : `${BaseUrl}${item.url}`,
+          // 确保 create_time 是字符串格式，如果是数字则转换
+          create_time:
+            typeof item.create_time === "number"
+              ? new Date(item.create_time).toISOString()
+              : item.create_time,
         }));
-        // 按时间排序，最新的在前面
-        const sortedData = processedData.sort(
-          (a, b) =>
-            new Date(b.create_time).getTime() -
-            new Date(a.create_time).getTime(),
-        );
-        setImages(sortedData);
+
+        // 数据已经按照相关性排序，我们只需要确保每组内部按时间排序
+        setImages(processedData);
       } else {
         throw new Error("返回数据格式错误");
       }
     } catch (err: any) {
-      setError(err.message);
+      setError("检索失败：" + err.message);
     } finally {
       setLoadingImages(false);
     }
