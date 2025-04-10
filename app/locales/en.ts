@@ -681,6 +681,21 @@ const en: LocaleType = {
       SubTitle: (count: number) => `Totally ${count} Todo`,
     },
   },
+  SearchObject: {
+    Name: "Memory Retrieval",
+    Page: {
+      Title: "Memory Retrieval",
+      Search: "Enter memory keywords",
+      SubTitle: (count: number) => `${count} records in total`,
+    },
+    // Steps: {
+    //   Analyzing: "Analyzing query",
+    //   Searching: "Searching database",
+    //   Processing: "Processing results",
+    //   Finalizing: "Finalizing"
+    // },
+  },
+
   SearchChat: {
     Name: "Search",
     Page: {
