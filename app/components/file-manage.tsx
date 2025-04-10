@@ -178,11 +178,8 @@ export function FileManage() {
           throw new Error("返回数据格式错误");
         }
       } catch (err: any) {
-        console.error("获取图片数据出错:", err);
-        setError(
-          "获取图片数据出错：" +
-            (err instanceof Error ? err.message : "未知错误"),
-        );
+        console.error("获取数据出错:", err);
+        setError("ERROR:" + (err instanceof Error ? err.message : "未知错误"));
       } finally {
         setLoadingImages(false);
       }

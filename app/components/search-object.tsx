@@ -9,11 +9,13 @@ import { Image, Result } from "antd"; // 图片卡片组件,卡片:布局组件,
 import { LoadingOutlined } from "@ant-design/icons"; // 加载图标
 import { BASE_URL } from "../constant";
 import searchStyle from "./search-object.module.scss";
+import { useEffect } from "react";
 
+// 修改 BaseUrl 的值
 const BaseUrl = BASE_URL;
 
 const apiUrl = {
-  images: "/api/v1/osearch",
+  images: "/v1/osearch",
 };
 
 // 定义图片接口
@@ -109,10 +111,20 @@ export function SearchObject() {
   const [images, setImages] = useState<ImageItem[]>([]);
   const [loadingImages, setLoadingImages] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // 进度条相关状态
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [shouldCompleteAnimation, setShouldCompleteAnimation] = useState(false);
 
   const Search = async () => {
     try {
       setLoadingImages(true);
+      // 新检索时清空错误信息
+      setError(null);
+      setCurrentStep(0);
+      setProgress(0);
+      setShouldCompleteAnimation(false);
+
       const url = `${BaseUrl}${apiUrl.images}?query=${encodeURIComponent(
         Object,
       )}`;
@@ -128,30 +140,80 @@ export function SearchObject() {
       if (!response.ok) {
         throw new Error("检索失败");
       }
+
       const data = await response.json();
       if (Array.isArray(data)) {
         const processedData = data.map((item) => ({
           ...item,
-          // 确保 URL 处理正确
           url: item.url.startsWith("http") ? item.url : `${BaseUrl}${item.url}`,
-          // 确保 create_time 是字符串格式，如果是数字则转换
           create_time:
             typeof item.create_time === "number"
               ? new Date(item.create_time).toISOString()
               : item.create_time,
         }));
 
-        // 数据已经按照相关性排序，我们只需要确保每组内部按时间排序
-        setImages(processedData);
+        // 数据处理成功，触发动画完成
+        setShouldCompleteAnimation(true);
+
+        setTimeout(() => {
+          setImages(processedData); // 更新图片数据
+          setLoadingImages(false); // 加载状态结束
+        }, 1000); // 延迟1秒，让动画完成
       } else {
         throw new Error("返回数据格式错误");
       }
     } catch (err: any) {
-      setError("检索失败：" + err.message);
-    } finally {
+      setError("ERROR:" + err.message);
       setLoadingImages(false);
     }
   };
+
+  useEffect(() => {
+    if (loadingImages) {
+      if (!shouldCompleteAnimation) {
+        setProgress(0);
+        setCurrentStep(0);
+        setShouldCompleteAnimation(false);
+      }
+
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (shouldCompleteAnimation) {
+            // true=请求到了
+            return Math.min(prev + 2, 100); // 加快完成速度
+          }
+          if (prev >= 70) {
+            // 进度达到100%
+            // clearInterval(progressInterval); // 清除定时器
+            return 70; // 进度设置为100%
+          } // 否则
+          return prev + 1; // 进度加1
+        });
+      }, 50); // 50ms更新一次进度
+
+      // 模拟步骤更新
+      let stepTimeouts: NodeJS.Timeout[] = []; // 用于存储每个步骤的定时器
+
+      if (!shouldCompleteAnimation) {
+        // 如果没有请求到才执行
+        const stepTimes = [1000, 2000, 3000]; // 每个步骤的时间点
+        stepTimeouts = stepTimes.map((time, index) => {
+          return setTimeout(() => {
+            setCurrentStep(index);
+          }, time);
+        });
+      } else {
+        // 请求到了，为true, to the last step
+        setCurrentStep(3);
+        setProgress(100);
+      }
+
+      return () => {
+        clearInterval(progressInterval); // 清除定时器
+        stepTimeouts.forEach((timeout) => clearTimeout(timeout)); // 遍历 stepTimeouts 数组，清除所有步骤定时器，确保定时器不会继续执行
+      };
+    }
+  }, [loadingImages, shouldCompleteAnimation]); // 当 loadingImages 变化时，重新运行 useEffect
 
   return (
     <ErrorBoundary>
@@ -208,16 +270,57 @@ export function SearchObject() {
               </div>
             </div>
 
-            {/* 添加错误信息显示 */}
-            {error && (
-              <div className={searchStyle["error-message"]}>{error}</div>
-            )}
+            {error && <div className={searchStyle.errorMessage}>{error}</div>}
 
-            {/* 添加加载状态或图片列表显示 */}
             {loadingImages ? (
-              <div className={searchStyle["loading-container"]}>
-                <LoadingOutlined />
-                <span>正在检索...</span>
+              <div className={searchStyle["ai-search-process"]}>
+                <div className={searchStyle["search-visual"]}>
+                  <div className={searchStyle["brain-container"]}>
+                    <div className={searchStyle["brain-pulse"]}></div>
+                    <div className={searchStyle["brain-network"]}></div>
+                    <div className={searchStyle["data-particles"]}></div>
+                  </div>
+                  <div className={searchStyle["processing-steps"]}>
+                    {[
+                      "下发query指令",
+                      "分析图像特征",
+                      "匹配检索物体",
+                      "生成结果",
+                    ].map((label, index) => (
+                      <div
+                        key={index}
+                        className={`${searchStyle["step"]} ${
+                          index === currentStep
+                            ? searchStyle["processing"]
+                            : index < currentStep
+                            ? searchStyle["completed"]
+                            : ""
+                        }`}
+                      >
+                        <div className={searchStyle["step-dot"]}></div>
+                        <div className={searchStyle["step-label"]}>{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={searchStyle["search-status"]}>
+                  <div className={searchStyle["status-text"]}>
+                    {
+                      [
+                        "Agent正在下发query指令...",
+                        "Agent正在分析图像特征...",
+                        "Agent正在匹配检索物体...",
+                        "Agent正在生成检索结果...",
+                      ][currentStep]
+                    }
+                  </div>
+                  <div className={searchStyle["progress-bar"]}>
+                    <div
+                      className={searchStyle["progress-fill"]}
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className={searchStyle["search-result-section"]}>
