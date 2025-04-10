@@ -174,206 +174,6 @@
   }
 }
 
-// 图片展示样式 - 蛇形布局
-.ImageGallery {
-  position: relative;
-  padding: 30px 0;
-  max-width: 1000px;
-  margin: 0 auto;
-  
-  @media (max-width: 768px) {
-    padding: 15px 0;
-  }
-}
-
-// 行容器
-.ImageRow {
-  display: flex;
-  margin-bottom: 80px;
-  position: relative;
-  
-  // 奇数行 - 从左到右
-  &:nth-child(odd) {
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-  
-  // 偶数行 - 从右到左
-  &:nth-child(even) {
-    flex-direction: row-reverse;
-    justify-content: flex-start;
-  }
-  
-  @media (max-width: 768px) {
-    margin-bottom: 30px;
-    
-    // 在移动端保持垂直布局，但保留蛇形连接线的视觉效果
-    &:nth-child(odd), &:nth-child(even) {
-      flex-direction: column !important;
-      align-items: center;
-    }
-  }
-}
-
-// 蛇形连接线
-.snakeConnector {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-  
-  @media (max-width: 768px) {
-    display: block; // 在移动端显示蛇形连接线
-    height: calc(100% + 30px); // 增加高度以适应垂直布局
-  }
-}
-
-.connector {
-  position: absolute;
-  border: 2px solid;
-  opacity: 0.8;
-  
-  &.rightDown {
-    right: 0;
-    bottom: -40px;
-    width: 40px;
-    height: 80px;
-    border-left: none;
-    border-top: none;
-    border-bottom-right-radius: 20px;
-  }
-  
-  &.leftDown {
-    left: 0;
-    bottom: -40px;
-    width: 40px;
-    height: 80px;
-    border-right: none;
-    border-top: none;
-    border-bottom-left-radius: 20px;
-  }
-  
-  @media (max-width: 768px) {
-    display: block; // 在移动端显示连接器
-    
-    &.rightDown, &.leftDown {
-      left: 50%;
-      right: auto;
-      bottom: -15px;
-      width: 2px;
-      height: 30px;
-      border: none;
-      border-radius: 0;
-      transform: translateX(-50%);
-    }
-  }
-}
-
-// 图片项样式
-.ImageWrapper {
-  position: relative;
-  width: 30%;
-  margin: 0 1.5%;
-  transition: all 0.4s ease;
-  
-  &:hover {
-    transform: translateY(-8px);
-  }
-  
-  @media (max-width: 768px) {
-    width: 90%;
-    margin: 0 0 30px 0;
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
-    
-    &:hover {
-      transform: translateY(-5px);
-    }
-  }
-  
-  // 同一行内的连接线和箭头
-  &:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    height: 2px;
-    z-index: 1;
-    opacity: 0.8;
-    
-    @media (max-width: 768px) {
-      left: 50%;
-      top: auto;
-      bottom: -15px;
-      width: 2px !important;
-      height: 15px;
-      transform: translateX(-50%);
-    }
-  }
-  
-  &:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    z-index: 2;
-    opacity: 0.8;
-    
-    @media (max-width: 768px) {
-      display: none; // 在移动端隐藏箭头
-    }
-  }
-}
-
-// 时间标签
-.ImageTime {
-  position: absolute;
-  top: -30px;
-  width: 100%;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  color: #555;
-  letter-spacing: 0.5px;
-  
-  @media (max-width: 768px) {
-    top: -25px;
-    font-size: 13px;
-  }
-}
-
-// 图片容器
-.ImageContent {
-  border: none;
-  border-radius: 16px;
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.4s ease;
-  position: relative;
-  
-  &:hover {
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-  }
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    z-index: 2;
-  }
-  
-  @media (max-width: 768px) {
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
-  }
-}
 
 .Image {
   width: 100%;
@@ -392,13 +192,14 @@
 
 .ImageInfo {
   padding: 16px 20px;
-  background: #f8f9fa;
+  background: #012f3c;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 
-  .ImagePlace {
-    font-size: 15px;
+  .ImageScore {
+    text-align: center;
+    font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: #f1d100;
     letter-spacing: 0.3px;
   }
   
@@ -631,4 +432,326 @@
 @keyframes progress {
   from { width: 10%; }
   to { width: 70%; }
+}
+
+// 时间线容器
+// 时间线容器样式优化
+.timelineContainer {
+  width: 95%;
+  padding: 16px;
+  background-color: rgba(245, 248, 250, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin: 0 auto;
+  
+  // 覆盖 Ant Design Timeline 样式
+  :global {
+    .ant-timeline {
+      padding-left: 0;
+    }
+    
+    .ant-timeline-item-label {
+      font-weight: 600;
+      font-size: 20px;
+      width: 80px !important;
+      text-align: right;
+    }
+    
+    .ant-timeline-item-tail {
+      border-left: 2px solid #1e88e5;
+      left: 90px !important;
+    }
+    
+    .ant-timeline-item-head {
+      left: 90px !important;
+    }
+    
+    .ant-timeline-item-content {
+      left: 200px !important;
+      width: calc(100% - 120px) !important;
+      margin-left: 0 !important;
+    }
+    
+    // 针对不同屏幕尺寸的响应式调整
+    @media (min-width: 768px) {
+      .ant-timeline-item-label {
+        font-size: 25px;
+        width: 25% !important;
+      }
+      
+      .ant-timeline-item-tail {
+        left: 28% !important;
+      }
+      
+      .ant-timeline-item-head {
+        left: 28% !important;
+      }
+      
+      .ant-timeline-item-content {
+        left: 32% !important;
+        width: calc(100% - 140px) !important;
+        padding: 8px 0!important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .ant-timeline-item-label {
+        font-size: 14px;
+        width: 60px !important;
+      }
+      
+      .ant-timeline-item-tail {
+        left: 70px !important;
+      }
+      
+      .ant-timeline-item-head {
+        left: 70px !important;
+      }
+      
+      .ant-timeline-item-content {
+        left: 90px !important;
+        width: calc(100% - 100px) !important;
+      }
+    }
+  }
+}
+
+// 时间线内容样式
+.timelineContent {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  width: 90%;
+  max-width: 500px;
+  
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+  }
+}
+
+// 堆叠图片效果
+.timelineImage {
+  cursor: pointer;
+  overflow: visible !important;
+  border-radius: 6px;
+  position: relative;
+  margin: 15px 15px 25px 15px; // 增加外边距，为更大的堆叠效果留出空间
+  z-index: 1;
+  
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); // 增强阴影效果
+    z-index: -1;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  &::before {
+    top: -15px; // 增加偏移量
+    right: -15px; // 增加偏移量
+    transform: rotate(5deg); // 增加旋转角度
+    background-color: #f9f9f9; // 稍微改变颜色，增加层次感
+  }
+  
+  &::after {
+    bottom: -15px; // 增加偏移量
+    left: -15px; // 增加偏移量
+    transform: rotate(-5deg); // 增加旋转角度
+    background-color: #f5f5f5; // 再次改变颜色，进一步增加层次感
+  }
+  
+  // 确保图片容器不会覆盖伪元素
+  .ant-image {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // 为主图片添加阴影
+  }
+  
+  // 修改悬停效果
+  &:hover {
+    &::before {
+      transform: rotate(7deg) translateY(-2px); // 增强悬停时的动画效果
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+    }
+    
+    &::after {
+      transform: rotate(-7deg) translateY(2px); // 增强悬停时的动画效果
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+    }
+  }
+}
+
+// 图片计数器
+.imageCounter {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  border: 2px solid white;
+}
+
+
+
+// 添加图片详情弹窗样式
+.imageModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+  backdrop-filter: blur(5px);
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eaeaea;
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: #ff3b30;
+    }
+  }
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.modalImageGallery {
+  flex: 1;
+  margin-bottom: 20px;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 0;
+    margin-right: 20px;
+  }
+}
+
+.modalImage {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+}
+
+.thumbnailContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.activeThumbnail {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.3);
+}
+
+.imageDetails {
+  flex: 0 0 300px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  
+  p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #333;
+    
+    strong {
+      color: #1e88e5;
+      margin-right: 5px;
+    }
+  }
 }

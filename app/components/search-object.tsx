@@ -5,13 +5,14 @@ import { IconButton } from "./button"; // 按钮
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // 路由
 import CloseIcon from "../icons/close.svg"; // 关闭图标
-import { Image, Result } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
+import { Image, Result, Timeline } from "antd"; // 图片卡片组件,卡片:布局组件,空状态
 import { LoadingOutlined } from "@ant-design/icons"; // 加载图标
 import { BASE_URL } from "../constant";
 import searchStyle from "./search-object.module.scss";
 import { useEffect } from "react";
 
 // 修改 BaseUrl 的值
+// const BaseUrl = "http://127.0.0.1:8000/api";
 const BaseUrl = BASE_URL;
 
 const apiUrl = {
@@ -21,7 +22,7 @@ const apiUrl = {
 // 定义图片接口
 interface ImageItem {
   id: string; // 图片id
-  url: string; // 图片路径
+  urls: string[]; // 图片路径
   name: string; // 图片名称
   place: string; // 物品地点
   create_time: string | number; // 创建时间
@@ -34,53 +35,61 @@ interface ImageGalleryProps {
   loading: boolean;
 }
 
-// 在ImageGallery组件中修改行渲染部分
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
+  const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
+  const [selectedUrl, setSelectedUrl] = useState<string>("");
+
   if (images.length) {
-    // 将图片按每行3个分组
-    const rows = [];
-    for (let i = 0; i < images.length; i += 3) {
-      rows.push(images.slice(i, i + 3));
-    }
-
     return (
-      <div className={searchStyle.ImageGallery}>
-        {rows.map((row, rowIndex) => (
-          <div key={rowIndex} className={searchStyle.ImageRow}>
-            {/* 添加蛇形连接线 */}
-            <div className={searchStyle.snakeConnector}>
-              {rowIndex < rows.length - 1 && (
-                <div
-                  className={`${searchStyle.connector} ${
-                    rowIndex % 2 === 0
-                      ? searchStyle.rightDown
-                      : searchStyle.leftDown
-                  }`}
-                ></div>
-              )}
-            </div>
+      <div className={searchStyle.timelineContainer}>
+        <h2
+          style={{
+            marginBottom: "20px",
+            color: "#333",
+            borderBottom: "2px dashed #1e88e5",
+            paddingBottom: "10px",
+          }}
+        >
+          检索结果集时间线 ({images.length})
+        </h2>
 
-            {row.map((image, index) => {
-              const date = new Date(image.create_time);
-              const formattedDate = `${
-                date.getMonth() + 1
-              }/${date.getDate()} ${date.getHours()}:${date
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`;
+        {/* 使用 Ant Design 的 Timeline 组件 */}
+        <Timeline
+          mode="left" // 改为 left 模式，使内容显示在时间轴左侧
+          style={{ maxWidth: "100%" }} // 设置最大宽度，避免超出容器宽度
+          items={images.map((image, index) => {
+            const date = new Date(image.create_time);
+            const formattedDate = `${
+              date.getMonth() + 1
+            }/${date.getDate()} ${date.getHours()}:${date
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}`;
 
-              return (
-                <div key={index} className={searchStyle.ImageWrapper}>
-                  <div className={searchStyle.ImageTime}>{formattedDate}</div>
-                  <div className={searchStyle.ImageContent}>
+            // 使用第一张图片作为时间线项的缩略图
+            const mainImageUrl = image.urls[0] || "";
+
+            return {
+              label: formattedDate,
+              color: "blue",
+              children: (
+                <div className={searchStyle.timelineContent}>
+                  <div
+                    className={searchStyle.timelineImage}
+                    onClick={() => {
+                      setSelectedImage(image);
+                      setSelectedUrl(mainImageUrl);
+                    }}
+                  >
+                    {/* 添加图片数量指示器，所有图片都显示 */}
+                    <div className={searchStyle.imageCounter}>
+                      {image.urls.length}
+                    </div>
                     <Image
-                      src={image.url}
+                      src={mainImageUrl}
                       alt={`Image ${index}`}
                       className={searchStyle.Image}
-                      preview={{
-                        src: image.url,
-                        scaleStep: 0.3,
-                      }}
+                      preview={false}
                       placeholder={
                         <div className={searchStyle.ImagePlaceholder}>
                           <LoadingOutlined />
@@ -88,16 +97,82 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                       }
                     />
                     <div className={searchStyle.ImageInfo}>
-                      <div className={searchStyle.ImagePlace}>
-                        位置: {image.place}
+                      <div className={searchStyle.ImageScore}>
+                        结果相关系数：{image.score?.toFixed(3)}
                       </div>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              ),
+            };
+          })}
+        />
+
+        {/* 图片详情弹窗 */}
+        {selectedImage && (
+          <div
+            className={searchStyle.imageModal}
+            onClick={() => setSelectedImage(null)}
+          >
+            <div
+              className={searchStyle.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={searchStyle.modalHeader}>
+                <h3>图片详情</h3>
+                <button onClick={() => setSelectedImage(null)}>×</button>
+              </div>
+              <div className={searchStyle.modalBody}>
+                <div className={searchStyle.modalImageGallery}>
+                  <Image
+                    src={selectedUrl}
+                    alt="Selected Image"
+                    className={searchStyle.modalImage}
+                    preview={{
+                      src: selectedUrl,
+                      scaleStep: 0.3,
+                    }}
+                  />
+                  <div className={searchStyle.thumbnailContainer}>
+                    {selectedImage.urls.map((url, idx) => (
+                      <div
+                        key={idx}
+                        className={`${searchStyle.thumbnail} ${
+                          url === selectedUrl ? searchStyle.activeThumbnail : ""
+                        }`}
+                        onClick={() => setSelectedUrl(url)}
+                      >
+                        <Image
+                          src={url}
+                          alt={`Thumbnail ${idx}`}
+                          preview={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={searchStyle.imageDetails}>
+                  <p>
+                    <strong>位置：</strong> {selectedImage.place}
+                  </p>
+                  <p>
+                    <strong>时间：</strong>{" "}
+                    {new Date(selectedImage.create_time).toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>名称：</strong> {selectedImage.name}
+                  </p>
+                  {selectedImage.score && (
+                    <p>
+                      <strong>相关性得分：</strong>{" "}
+                      {selectedImage.score.toFixed(2)}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        ))}
+        )}
       </div>
     );
   } else {
@@ -127,7 +202,7 @@ export function SearchObject() {
 
       const url = `${BaseUrl}${apiUrl.images}?query=${encodeURIComponent(
         Object,
-      )}`;
+      )}&quota=10&n=5`;
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -142,15 +217,27 @@ export function SearchObject() {
       }
 
       const data = await response.json();
+      console.log("Response data:", data); // 查看数据结构
+
       if (Array.isArray(data)) {
-        const processedData = data.map((item) => ({
-          ...item,
-          url: item.url.startsWith("http") ? item.url : `${BaseUrl}${item.url}`,
-          create_time:
-            typeof item.create_time === "number"
-              ? new Date(item.create_time).toISOString()
-              : item.create_time,
-        }));
+        const processedData = data.map((item) => {
+          // 确保 urls 存在且是数组
+          const imageUrls = Array.isArray(item.urls) ? item.urls : [];
+
+          return {
+            ...item,
+            // 处理每个URL，确保完整路径
+            urls: imageUrls.map((url: string) =>
+              typeof url === "string" && url.startsWith("http")
+                ? url
+                : `${BaseUrl}${url}`,
+            ),
+            create_time:
+              typeof item.create_time === "number"
+                ? item.create_time // 保持数字格式
+                : item.create_time || Date.now(), // 如果不存在则使用当前时间
+          };
+        });
 
         // 数据处理成功，触发动画完成
         setShouldCompleteAnimation(true);
