@@ -190,6 +190,8 @@ export function SearchObject() {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [shouldCompleteAnimation, setShouldCompleteAnimation] = useState(false);
+  const quota = 10;
+  const n = 3;
 
   const Search = async () => {
     try {
@@ -202,7 +204,7 @@ export function SearchObject() {
 
       const url = `${BaseUrl}${apiUrl.images}?query=${encodeURIComponent(
         Object,
-      )}&quota=10&n=5`;
+      )}&quota=${quota}&n=${n}`;
       const response = await fetch(url, {
         method: "GET",
         headers: {
