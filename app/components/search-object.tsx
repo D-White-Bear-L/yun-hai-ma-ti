@@ -15,6 +15,9 @@ import { useEffect } from "react";
 // const BaseUrl = "http://127.0.0.1:8000/api";
 const BaseUrl = BASE_URL;
 
+const quota = 10;
+const n = 3;
+
 const apiUrl = {
   images: "/v1/osearch",
 };
@@ -66,8 +69,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               .toString()
               .padStart(2, "0")}`;
 
-            // 使用第一张图片作为时间线项的缩略图
-            const mainImageUrl = image.urls[0] || "";
+            // 使用中间图片作为时间线项的缩略图
+            const mainImageUrl = image.urls[n] || "";
 
             return {
               label: formattedDate,
@@ -190,8 +193,6 @@ export function SearchObject() {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const [shouldCompleteAnimation, setShouldCompleteAnimation] = useState(false);
-  const quota = 10;
-  const n = 3;
 
   const Search = async () => {
     try {
