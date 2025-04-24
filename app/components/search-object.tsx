@@ -63,7 +63,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
           items={images.map((image, index) => {
             const date = new Date(image.create_time);
             const formattedDate = `${
-              date.getMonth() + 1
+              date.getMonth() + 1 // 月份从0开始，需要加1
             }/${date.getDate()} ${date.getHours()}:${date
               .getMinutes()
               .toString()
@@ -80,8 +80,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                   <div
                     className={searchStyle.timelineImage}
                     onClick={() => {
-                      setSelectedImage(image);
-                      setSelectedUrl(mainImageUrl);
+                      setSelectedImage(image); // 设置当前图片为选中图片
+                      setSelectedUrl(mainImageUrl); // 设置当前图片的主URL
                     }}
                   >
                     {/* 添加图片数量指示器，所有图片都显示 */}
@@ -112,7 +112,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
         />
 
         {/* 图片详情弹窗 */}
-        {selectedImage && (
+        {selectedImage && ( // 条件渲染: 当 selectedImage 不为 null 时显示
           <div
             className={searchStyle.imageModal}
             onClick={() => setSelectedImage(null)}
