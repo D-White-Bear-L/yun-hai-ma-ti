@@ -1,5 +1,4 @@
 // 引入组件
-// 1、项目组件
 import { ErrorBoundary } from "./error"; // 错误边界
 import styles from "./mask.module.scss";
 import Locale from "../locales"; // 语言包
@@ -30,7 +29,6 @@ interface ImageGalleryProps {
   loading: boolean;
 }
 
-// 修改基础URL
 // const BaseUrl = "http://127.0.0.1:8000/api"; //test
 const BaseUrl = BASE_URL;
 
